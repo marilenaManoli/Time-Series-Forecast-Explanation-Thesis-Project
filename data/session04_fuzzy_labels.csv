@@ -1,0 +1,3 @@
+Model,MAE,RMSE,MAPE,MPE,MAE_Label,MPE_Label,Combined_Label
+Prophet,1404.14,1803.539,9.485,-2.578,low error,slight underprediction,"low error, slight underprediction"
+ETS,2711.084,3479.82,16.798,14.997,high error,slight overprediction,"high error, slight overprediction"

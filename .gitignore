@@ -1,24 +1,13 @@
-# Python specific ignores
+# Python
 *.pyc
 __pycache__/
 .ipynb_checkpoints/
 venv/
-.vscode/ # VS Code specific folder (if you use it)
+.vscode/
 
-# OS ignores
-.DS_Store # macOS specific
-Thumbs.db # Windows specific
+# OS
+.DS_Store
+Thumbs.db
 
-# Data ignores (VERY important for thesis data)
-data/ # If you store large raw datasets locally, ignore this folder
-*.csv
-*.json
-*.xlsx
-*.pdf  # You might want to ignore large PDF datasets, but not your thesis PDF itself. Be specific.
-
-# Ignore example for your environment setup
-# If your virtual environment is inside a folder called 'my_thesis_env'
-# my_thesis_env/
-
-# If data is directly in the project root, ignore large files
-# large_dataset.csv
+# Thesis data
+data/archive/
