@@ -1,0 +1,3 @@
+Model,MAE,RMSE,MAPE,MPE,MAE_Label,MPE_Label,Combined_Label,Structured_Explanation
+Prophet,1404.14,1803.539,9.485,-2.578,low error,slight underprediction,"low error, slight underprediction",The model is accurate overall and slightly conservative in its forecasts.
+ETS,2711.084,3479.82,16.798,14.997,high error,slight overprediction,"high error, slight overprediction",The model has high error and tends to overpredict demand.
