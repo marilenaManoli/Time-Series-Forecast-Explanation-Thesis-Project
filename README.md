@@ -1,28 +1,49 @@
-# Time-Series-Forecast-Explanation-Thesis-Project
+# Time-Series Forecast Explanation Thesis Project
 
-Master's Thesis: **Explaining Forecast Quality and Reliability in Time-Series Forecasting using Computing with Words**
+Master’s thesis on explaining time-series forecast quality using Computing with Words and fuzzy linguistic labels.
 
-This repository contains the notebooks and supporting outputs developed for a master's thesis on interpretable time-series forecasting. The project presents a pipeline for forecasting hourly electricity demand and for expressing forecast quality and reliability in linguistic terms.
+## Overview
 
-The workflow covers data preparation, baseline forecasting, forecast evaluation, fuzzy label generation, structured explanations, and narrative summaries. The objective is to make forecast performance more interpretable while preserving a clear link to the underlying error metrics.
+This project:
+- Forecasts time-series data
+- Evaluates prediction quality
+- Converts metrics into human-readable explanations
 
-## Project Structure
+## Workflow
 
-- 01_data_preparation.ipynb
-- 02_baseline_forecasting_models.ipynb
-- 03_forecast_evaluation_and_interpretation.ipynb
-- 04_fuzzy_labels.ipynb
-- 05_structured_explanations.ipynb
-- 06_narrative_layer.ipynb
-- 07_full_pipeline.ipynb
-- data/
-- requirements.txt
-- README.md
+1. Data preparation  
+2. Forecasting  
+3. Evaluation  
+4. Fuzzy labels  
+5. Explanations  
+6. Narrative layer  
+7. Full pipeline  
 
-## Reproducibility
+## Structure
 
-Install the dependencies listed in `requirements.txt` and run the notebooks in numerical order. Intermediate and final outputs are stored in `data/`.
+    notebooks/   → full pipeline (01 → 07)
+    src/data/    → outputs (metrics, labels, explanations)
+    src/         → React viewer
 
-## Thesis Focus
+## Setup
 
-The thesis investigates how Computing with Words can support the communication of forecast quality and reliability in a more interpretable form than numeric error measures alone.
+### Python
+
+    python -m venv .venv
+    source .venv/bin/activate
+    pip install -r requirements.txt
+    jupyter lab
+
+### Web App
+
+    npm install
+    npm run dev
+
+## Goal
+
+Make forecast results easier to understand using linguistic explanations instead of only numeric metrics.
+
+## Author
+
+Marilena Manoli  
+University of Bern
