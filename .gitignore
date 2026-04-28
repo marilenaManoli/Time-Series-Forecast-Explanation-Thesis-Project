@@ -3,11 +3,22 @@
 __pycache__/
 .ipynb_checkpoints/
 venv/
+.venv/
+
+# VS Code
 .vscode/
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Thesis data
-data/archive/
+# Node / Vite
+node_modules/
+dist/
+
+# Data files
+data/
+# *.csv
+# *.json
+# *.xlsx
+# *.pdf
