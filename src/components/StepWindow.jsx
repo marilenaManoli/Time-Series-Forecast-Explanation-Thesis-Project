@@ -1,80 +1,82 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 export default function StepWindow({ step }) {
-  const [showDetails, setShowDetails] = useState(false);
-
   if (!step) return null;
 
-  const htmlFile = step.htmlFallback;
-  const previewUrl = `/${step.htmlFallback}`;
-  const notebookUrl = `/${step.file}`;
+  // Always link to the canonical notebook path, never the .ipynb_checkpoints version.
+  // GitHub raw links work if the repo is public; for local use, the relative path opens in JupyterLab.
+  const notebookHref = step.file;   // e.g. "notebooks/03_forecast_evaluation_and_interpretation.ipynb"
 
   return (
-    <section className="step-view" aria-labelledby={`step-title-${step.id}`}>
-      <header className="step-hero">
-        <div>
-          <p className="step-kicker">Step {step.id}</p>
-          <h2 id={`step-title-${step.id}`} className="step-title">{step.title}</h2>
-          <p className="step-description">{step.tagline}</p>
-        </div>
-
-        <div className="step-actions">
-          <a className="button button--primary" href={notebookUrl} target="_blank" rel="noreferrer">
-            Open notebook
-          </a>
-          <a className="button" href={previewUrl} target="_blank" rel="noreferrer">
-            View HTML
-          </a>
-        </div>
-      </header>
-
-      <div className="step-grid">
-        <article className="card">
-          <h3>What happens here</h3>
-          <ul>
-            {(step.run || []).map((item) => <li key={item}>{item}</li>)}
-          </ul>
-        </article>
-
-        <article className="card">
-          <h3>What you get</h3>
-          <ul>
-            {(step.results || []).map((item) => <li key={item}>{item}</li>)}
-          </ul>
-        </article>
+    <div>
+      <div className="step-content__header">
+        <p className="step-content__eyebrow">Step {step.id}</p>
+        <h2 className="step-content__title">{step.title}</h2>
+        <p className="step-content__tagline">{step.tagline}</p>
       </div>
 
-      <button
-        type="button"
-        className="details-toggle"
-        onClick={() => setShowDetails((v) => !v)}
-        aria-expanded={showDetails}
-      >
-        {showDetails ? 'Hide details' : 'Show explanation'}
-      </button>
-
-      {showDetails && (
-        <div className="card card--muted">
-          <h3>Explanation</h3>
-          <ul>
-            {(step.explanation || []).map((item) => <li key={item}>{item}</li>)}
-          </ul>
-          <p className="presenter-note">{step.presenter}</p>
+      {step.run?.length > 0 && (
+        <div className="step-content__section">
+          <p className="step-content__section-label">What this notebook does</p>
+          <div className="step-content__card">
+            <ul className="step-content__list">
+              {step.run.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          </div>
         </div>
       )}
 
-      <section className="preview card" aria-label="Notebook preview">
-        <div className="preview__bar">
-          <span className="preview__label">Preview</span>
-          <span className="preview__path">{htmlFile}</span>
+      {step.results?.length > 0 && (
+        <div className="step-content__section">
+          <p className="step-content__section-label">Outputs produced</p>
+          <div className="step-content__card">
+            <ul className="step-content__list">
+              {step.results.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          </div>
         </div>
-        <iframe
-          title={`${step.title} preview`}
-          src={previewUrl}
-          className="preview__frame"
-          loading="lazy"
-        />
-      </section>
-    </section>
+      )}
+
+      {step.explanation?.length > 0 && (
+        <div className="step-content__section">
+          <p className="step-content__section-label">Explanation context</p>
+          <div className="step-content__card">
+            <ul className="step-content__list">
+              {step.explanation.map((item, i) => <li key={i}>{item}</li>)}
+            </ul>
+          </div>
+        </div>
+      )}
+
+      {step.presenter && (
+        <div className="step-content__section">
+          <p className="step-content__section-label">Presenter note</p>
+          <div className="presenter-note">
+            <p>{step.presenter}</p>
+          </div>
+        </div>
+      )}
+
+      <div className="step-content__actions">
+        <a
+          href={notebookHref}
+          className="btn btn--primary"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Open notebook ↗
+        </a>
+        {step.htmlFallback && (
+          <a
+            href={`/public/${step.htmlFallback}`}
+            className="btn btn--secondary"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Preview HTML export
+          </a>
+        )}
+      </div>
+    </div>
   );
 }
