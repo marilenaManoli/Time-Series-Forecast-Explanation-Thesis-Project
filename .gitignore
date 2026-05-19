@@ -18,6 +18,9 @@ dist/
 
 # Data files
 data/
+
+# Thesis draft
+THESIS_DRAFT.md
 # *.csv
 # *.json
 # *.xlsx
