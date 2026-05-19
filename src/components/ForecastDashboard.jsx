@@ -72,30 +72,33 @@ function Bar({ value, max, color }) {
 }
 
 function ModelBarChart({ data, metric }) {
-  const max = Math.max(...data.map(d => d[metric]), 1);
+  const higherIsBetter = metric === 'DA';
+  const vals = data.map(d => d[metric]);
+  const minV = Math.min(...vals);
+  const maxV = Math.max(...vals, minV + 0.001);
   const isPercent = ['MAPE', 'MPE', 'DA'].includes(metric);
   const fmt = v => isPercent ? `${v}%` : v;
+
+  const barWidth = v => {
+    if (higherIsBetter) return Math.max(4, ((v - minV) / (maxV - minV)) * 100);
+    return Math.max(4, (1 - (v - minV) / (maxV - minV)) * 100);
+  };
+
   return (
     <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem', marginBottom: 16 }}>
       <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 12 }}>
-        {metric} — visual comparison {metric === 'DA' ? '(higher is better)' : '(lower is better)'}
+        {metric} — visual comparison ({higherIsBetter ? 'longer bar = better' : 'longer bar = better'})
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
-        {data.map(d => {
-          const pct = metric === 'DA'
-            ? (d[metric] / max) * 100
-            : (1 - (d[metric] - Math.min(...data.map(x => x[metric]))) / (max - Math.min(...data.map(x => x[metric])) || 1)) * 100;
-          const barPct = (d[metric] / max) * 100;
-          return (
-            <div key={d.model} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span style={{ width: 130, fontSize: 11, color: '#3d3d3a', textAlign: 'right', flexShrink: 0 }}>{d.model}</span>
-              <div style={{ flex: 1, height: 12, background: 'rgba(0,0,0,0.06)', borderRadius: 3, overflow: 'hidden' }}>
-                <div style={{ width: `${barPct}%`, height: '100%', background: d.color, borderRadius: 3, transition: 'width 0.4s ease' }} />
-              </div>
-              <span style={{ fontSize: 11, minWidth: 52, color: '#1a1a18', fontVariantNumeric: 'tabular-nums' }}>{fmt(d[metric])}</span>
+        {data.map(d => (
+          <div key={d.model} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ width: 130, fontSize: 11, color: '#3d3d3a', textAlign: 'right', flexShrink: 0 }}>{d.model}</span>
+            <div style={{ flex: 1, height: 12, background: 'rgba(0,0,0,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+              <div style={{ width: `${barWidth(d[metric])}%`, height: '100%', background: d.color, borderRadius: 3, transition: 'width 0.4s ease' }} />
             </div>
-          );
-        })}
+            <span style={{ fontSize: 11, minWidth: 52, color: '#1a1a18', fontVariantNumeric: 'tabular-nums' }}>{fmt(d[metric])}</span>
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -188,12 +191,6 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
 
   const selected     = selectedModel ? sorted.find(d => d.model === selectedModel) : null;
   const selForecasts = useMemo(() => forecasts?.filter(f => f.model === selectedModel).slice(0, 30) || [], [forecasts, selectedModel]);
-
-  // Narrative for selected model from session06 CSV
-  const selNarrative = useMemo(() => {
-    if (!narratives || !selectedModel) return null;
-    return narratives.find(r => r.model === selectedModel || r.Model === selectedModel);
-  }, [narratives, selectedModel]);
 
   const TABS = [
     { id: 'metrics',      label: 'Metrics & quality' },
