@@ -1,8 +1,8 @@
-Model,MAE,RMSE,MAPE,MPE,DA,MAE_Label,MPE_Label,Combined_Label
-Naive,781.31,948.15,5.468,5.434,0.0,high error,slight overprediction,"high error, slight overprediction"
-Seasonal Naive,130.4,152.6,0.929,0.892,96.55,low error,neutral,"low error, neutral"
-Linear Regression,483.29,547.7,3.472,-0.015,48.28,medium error,neutral,"medium error, neutral"
-ETS,44.67,57.32,0.32,0.049,96.55,low error,neutral,"low error, neutral"
-HWES (damped),62.69,79.08,0.448,0.404,96.55,low error,neutral,"low error, neutral"
-SARIMA,45.66,59.78,0.326,0.142,96.55,low error,neutral,"low error, neutral"
-Prophet,89.01,112.18,0.637,0.611,96.55,low error,neutral,"low error, neutral"
+Model,MAE,RMSE,MAPE,MPE,DA,MAE_Label,MPE_Label,MAPE_Label,DA_Label,Combined_Label
+Naive,1827.63,2165.77,11.98,5.419,0.0,high error,slight overprediction,high mape,low DA,"high error, slight overprediction"
+Seasonal Naive,1352.16,1719.28,8.944,-0.571,59.77,medium error,neutral,medium mape,medium DA,"medium error, neutral"
+Linear Regression,1238.04,1505.5,7.936,2.908,50.58,low error,slight overprediction,medium mape,low DA,"low error, slight overprediction"
+ETS,1546.33,1812.99,10.018,5.249,66.67,medium error,slight overprediction,medium mape,medium DA,"medium error, slight overprediction"
+HWES (damped),1517.14,1779.22,9.821,5.222,67.82,medium error,slight overprediction,medium mape,medium DA,"medium error, slight overprediction"
+SARIMA,1435.0,1704.85,9.209,4.487,66.67,medium error,slight overprediction,medium mape,medium DA,"medium error, slight overprediction"
+Prophet,1091.53,1320.09,7.053,2.614,65.52,low error,slight overprediction,low mape,medium DA,"low error, slight overprediction"

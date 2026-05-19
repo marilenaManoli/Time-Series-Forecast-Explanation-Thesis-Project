@@ -7,8 +7,8 @@ function cww(value, thresholds, labels) {
   }
   return labels[labels.length - 1];
 }
-const mapeLabel = v => cww(v, [1, 2, 4, 8], ['excellent', 'good', 'acceptable', 'poor', 'very poor']);
-const daLabel   = v => cww(v, [50, 60, 70, 80], ['random', 'low', 'moderate', 'high', 'very high']);
+const mapeLabel = v => cww(v, [5, 8, 10, 13], ['excellent', 'good', 'acceptable', 'poor', 'very poor']);
+const daLabel   = v => cww(v, [55, 65, 75, 85], ['random', 'low', 'moderate', 'high', 'very high']);
 function biasLabel(mpe) {
   if (Math.abs(mpe) < 1) return { text: 'unbiased', dir: 'neutral' };
   return mpe > 0
@@ -67,6 +67,36 @@ function Bar({ value, max, color }) {
         <div style={{ width: `${Math.min(100, (value / max) * 100)}%`, height: '100%', background: color, borderRadius: 4, transition: 'width 0.35s ease' }} />
       </div>
       <span style={{ fontSize: 12, fontWeight: 500, minWidth: 50, textAlign: 'right', color: '#1a1a18' }}>{value}</span>
+    </div>
+  );
+}
+
+function ModelBarChart({ data, metric }) {
+  const max = Math.max(...data.map(d => d[metric]), 1);
+  const isPercent = ['MAPE', 'MPE', 'DA'].includes(metric);
+  const fmt = v => isPercent ? `${v}%` : v;
+  return (
+    <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem', marginBottom: 16 }}>
+      <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 12 }}>
+        {metric} — visual comparison {metric === 'DA' ? '(higher is better)' : '(lower is better)'}
+      </p>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
+        {data.map(d => {
+          const pct = metric === 'DA'
+            ? (d[metric] / max) * 100
+            : (1 - (d[metric] - Math.min(...data.map(x => x[metric]))) / (max - Math.min(...data.map(x => x[metric])) || 1)) * 100;
+          const barPct = (d[metric] / max) * 100;
+          return (
+            <div key={d.model} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span style={{ width: 130, fontSize: 11, color: '#3d3d3a', textAlign: 'right', flexShrink: 0 }}>{d.model}</span>
+              <div style={{ flex: 1, height: 12, background: 'rgba(0,0,0,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                <div style={{ width: `${barPct}%`, height: '100%', background: d.color, borderRadius: 3, transition: 'width 0.4s ease' }} />
+              </div>
+              <span style={{ fontSize: 11, minWidth: 52, color: '#1a1a18', fontVariantNumeric: 'tabular-nums' }}>{fmt(d[metric])}</span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -220,6 +250,9 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
 
                   {/* Metric info panel */}
                   {activeMetricInfo && <MetricInfo metricKey={activeMetricInfo} onClose={() => setActiveMetricInfo(null)} />}
+
+                  {/* Bar chart */}
+                  <ModelBarChart data={sorted} metric={sortBy} />
 
                   {/* Table */}
                   <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, overflow: 'hidden', marginBottom: 20 }}>

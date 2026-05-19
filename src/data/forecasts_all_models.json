@@ -1,0 +1,1262 @@
+[
+  {
+    "date": "2018-07-05",
+    "actual": 17609.0,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-06",
+    "actual": 15742.92,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-07",
+    "actual": 13610.33,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-08",
+    "actual": 13768.71,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-09",
+    "actual": 16427.33,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-10",
+    "actual": 17489.33,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-11",
+    "actual": 16714.12,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-12",
+    "actual": 16330.83,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-13",
+    "actual": 16911.29,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-14",
+    "actual": 16488.38,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-15",
+    "actual": 16296.21,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-16",
+    "actual": 17400.04,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-17",
+    "actual": 17311.12,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-18",
+    "actual": 15814.04,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-19",
+    "actual": 15889.92,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-20",
+    "actual": 15332.5,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-21",
+    "actual": 13795.25,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-22",
+    "actual": 13479.33,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-23",
+    "actual": 15410.08,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-24",
+    "actual": 15890.54,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-25",
+    "actual": 16503.33,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-26",
+    "actual": 16474.25,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-27",
+    "actual": 15816.62,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-28",
+    "actual": 14113.08,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-29",
+    "actual": 13658.0,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-30",
+    "actual": 15368.08,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-31",
+    "actual": 15180.29,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-08-01",
+    "actual": 15151.17,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-08-02",
+    "actual": 15687.67,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-08-03",
+    "actual": 14809.0,
+    "predicted": 17008.5,
+    "model": "Naive"
+  },
+  {
+    "date": "2018-07-05",
+    "actual": 17609.0,
+    "predicted": 16450.25,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-06",
+    "actual": 15742.92,
+    "predicted": 17174.67,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-07",
+    "actual": 13610.33,
+    "predicted": 16760.29,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-08",
+    "actual": 13768.71,
+    "predicted": 16798.79,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-09",
+    "actual": 16427.33,
+    "predicted": 17502.88,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-10",
+    "actual": 17489.33,
+    "predicted": 17590.17,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-11",
+    "actual": 16714.12,
+    "predicted": 17008.5,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-12",
+    "actual": 16330.83,
+    "predicted": 16450.25,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-13",
+    "actual": 16911.29,
+    "predicted": 17174.67,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-14",
+    "actual": 16488.38,
+    "predicted": 16760.29,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-15",
+    "actual": 16296.21,
+    "predicted": 16798.79,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-16",
+    "actual": 17400.04,
+    "predicted": 17502.88,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-17",
+    "actual": 17311.12,
+    "predicted": 17590.17,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-18",
+    "actual": 15814.04,
+    "predicted": 17008.5,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-19",
+    "actual": 15889.92,
+    "predicted": 16450.25,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-20",
+    "actual": 15332.5,
+    "predicted": 17174.67,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-21",
+    "actual": 13795.25,
+    "predicted": 16760.29,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-22",
+    "actual": 13479.33,
+    "predicted": 16798.79,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-23",
+    "actual": 15410.08,
+    "predicted": 17502.88,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-24",
+    "actual": 15890.54,
+    "predicted": 17590.17,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-25",
+    "actual": 16503.33,
+    "predicted": 17008.5,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-26",
+    "actual": 16474.25,
+    "predicted": 16450.25,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-27",
+    "actual": 15816.62,
+    "predicted": 17174.67,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-28",
+    "actual": 14113.08,
+    "predicted": 16760.29,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-29",
+    "actual": 13658.0,
+    "predicted": 16798.79,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-30",
+    "actual": 15368.08,
+    "predicted": 17502.88,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-31",
+    "actual": 15180.29,
+    "predicted": 17590.17,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-08-01",
+    "actual": 15151.17,
+    "predicted": 17008.5,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-08-02",
+    "actual": 15687.67,
+    "predicted": 16450.25,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-08-03",
+    "actual": 14809.0,
+    "predicted": 17174.67,
+    "model": "Seasonal Naive"
+  },
+  {
+    "date": "2018-07-05",
+    "actual": 17609.0,
+    "predicted": 14655.31,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-06",
+    "actual": 15742.92,
+    "predicted": 14654.97,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-07",
+    "actual": 13610.33,
+    "predicted": 14654.64,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-08",
+    "actual": 13768.71,
+    "predicted": 14654.3,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-09",
+    "actual": 16427.33,
+    "predicted": 14653.97,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-10",
+    "actual": 17489.33,
+    "predicted": 14653.63,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-11",
+    "actual": 16714.12,
+    "predicted": 14653.3,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-12",
+    "actual": 16330.83,
+    "predicted": 14652.96,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-13",
+    "actual": 16911.29,
+    "predicted": 14652.63,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-14",
+    "actual": 16488.38,
+    "predicted": 14652.29,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-15",
+    "actual": 16296.21,
+    "predicted": 14651.96,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-16",
+    "actual": 17400.04,
+    "predicted": 14651.62,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-17",
+    "actual": 17311.12,
+    "predicted": 14651.29,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-18",
+    "actual": 15814.04,
+    "predicted": 14650.95,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-19",
+    "actual": 15889.92,
+    "predicted": 14650.61,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-20",
+    "actual": 15332.5,
+    "predicted": 14650.28,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-21",
+    "actual": 13795.25,
+    "predicted": 14649.94,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-22",
+    "actual": 13479.33,
+    "predicted": 14649.61,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-23",
+    "actual": 15410.08,
+    "predicted": 14649.27,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-24",
+    "actual": 15890.54,
+    "predicted": 14648.94,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-25",
+    "actual": 16503.33,
+    "predicted": 14648.6,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-26",
+    "actual": 16474.25,
+    "predicted": 14648.27,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-27",
+    "actual": 15816.62,
+    "predicted": 14647.93,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-28",
+    "actual": 14113.08,
+    "predicted": 14647.6,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-29",
+    "actual": 13658.0,
+    "predicted": 14647.26,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-30",
+    "actual": 15368.08,
+    "predicted": 14646.93,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-31",
+    "actual": 15180.29,
+    "predicted": 14646.59,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-08-01",
+    "actual": 15151.17,
+    "predicted": 14646.26,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-08-02",
+    "actual": 15687.67,
+    "predicted": 14645.92,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-08-03",
+    "actual": 14809.0,
+    "predicted": 14645.59,
+    "model": "Linear Regression"
+  },
+  {
+    "date": "2018-07-05",
+    "actual": 17609.0,
+    "predicted": 17038.78,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-06",
+    "actual": 15742.92,
+    "predicted": 16797.2,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-07",
+    "actual": 13610.33,
+    "predicted": 15647.78,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-08",
+    "actual": 13768.71,
+    "predicted": 15190.41,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-09",
+    "actual": 16427.33,
+    "predicted": 16678.16,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-10",
+    "actual": 17489.33,
+    "predicted": 16982.03,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-11",
+    "actual": 16714.12,
+    "predicted": 17032.5,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-12",
+    "actual": 16330.83,
+    "predicted": 17060.4,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-13",
+    "actual": 16911.29,
+    "predicted": 16818.82,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-14",
+    "actual": 16488.38,
+    "predicted": 15669.41,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-15",
+    "actual": 16296.21,
+    "predicted": 15212.04,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-16",
+    "actual": 17400.04,
+    "predicted": 16699.79,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-17",
+    "actual": 17311.12,
+    "predicted": 17003.65,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-18",
+    "actual": 15814.04,
+    "predicted": 17054.13,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-19",
+    "actual": 15889.92,
+    "predicted": 17082.03,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-20",
+    "actual": 15332.5,
+    "predicted": 16840.45,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-21",
+    "actual": 13795.25,
+    "predicted": 15691.03,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-22",
+    "actual": 13479.33,
+    "predicted": 15233.66,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-23",
+    "actual": 15410.08,
+    "predicted": 16721.41,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-24",
+    "actual": 15890.54,
+    "predicted": 17025.28,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-25",
+    "actual": 16503.33,
+    "predicted": 17075.75,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-26",
+    "actual": 16474.25,
+    "predicted": 17103.65,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-27",
+    "actual": 15816.62,
+    "predicted": 16862.07,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-28",
+    "actual": 14113.08,
+    "predicted": 15712.66,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-29",
+    "actual": 13658.0,
+    "predicted": 15255.29,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-30",
+    "actual": 15368.08,
+    "predicted": 16743.04,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-31",
+    "actual": 15180.29,
+    "predicted": 17046.9,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-08-01",
+    "actual": 15151.17,
+    "predicted": 17097.38,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-08-02",
+    "actual": 15687.67,
+    "predicted": 17125.28,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-08-03",
+    "actual": 14809.0,
+    "predicted": 16883.7,
+    "model": "ETS"
+  },
+  {
+    "date": "2018-07-05",
+    "actual": 17609.0,
+    "predicted": 17041.83,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-06",
+    "actual": 15742.92,
+    "predicted": 16803.53,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-07",
+    "actual": 13610.33,
+    "predicted": 15650.95,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-08",
+    "actual": 13768.71,
+    "predicted": 15187.52,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-09",
+    "actual": 16427.33,
+    "predicted": 16675.08,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-10",
+    "actual": 17489.33,
+    "predicted": 16971.28,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-11",
+    "actual": 16714.12,
+    "predicted": 17010.58,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-12",
+    "actual": 16330.83,
+    "predicted": 17041.83,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-13",
+    "actual": 16911.29,
+    "predicted": 16803.53,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-14",
+    "actual": 16488.38,
+    "predicted": 15650.95,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-15",
+    "actual": 16296.21,
+    "predicted": 15187.52,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-16",
+    "actual": 17400.04,
+    "predicted": 16675.08,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-17",
+    "actual": 17311.12,
+    "predicted": 16971.28,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-18",
+    "actual": 15814.04,
+    "predicted": 17010.58,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-19",
+    "actual": 15889.92,
+    "predicted": 17041.83,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-20",
+    "actual": 15332.5,
+    "predicted": 16803.53,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-21",
+    "actual": 13795.25,
+    "predicted": 15650.95,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-22",
+    "actual": 13479.33,
+    "predicted": 15187.52,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-23",
+    "actual": 15410.08,
+    "predicted": 16675.08,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-24",
+    "actual": 15890.54,
+    "predicted": 16971.28,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-25",
+    "actual": 16503.33,
+    "predicted": 17010.58,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-26",
+    "actual": 16474.25,
+    "predicted": 17041.83,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-27",
+    "actual": 15816.62,
+    "predicted": 16803.53,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-28",
+    "actual": 14113.08,
+    "predicted": 15650.95,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-29",
+    "actual": 13658.0,
+    "predicted": 15187.52,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-30",
+    "actual": 15368.08,
+    "predicted": 16675.08,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-31",
+    "actual": 15180.29,
+    "predicted": 16971.28,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-08-01",
+    "actual": 15151.17,
+    "predicted": 17010.58,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-08-02",
+    "actual": 15687.67,
+    "predicted": 17041.83,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-08-03",
+    "actual": 14809.0,
+    "predicted": 16803.53,
+    "model": "HWES (damped)"
+  },
+  {
+    "date": "2018-07-05",
+    "actual": 17609.0,
+    "predicted": 16850.93,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-06",
+    "actual": 15742.92,
+    "predicted": 16735.08,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-07",
+    "actual": 13610.33,
+    "predicted": 15719.06,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-08",
+    "actual": 13768.71,
+    "predicted": 15336.03,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-09",
+    "actual": 16427.33,
+    "predicted": 16686.01,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-10",
+    "actual": 17489.33,
+    "predicted": 16844.91,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-11",
+    "actual": 16714.12,
+    "predicted": 16901.61,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-12",
+    "actual": 16330.83,
+    "predicted": 16948.57,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-13",
+    "actual": 16911.29,
+    "predicted": 16776.94,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-14",
+    "actual": 16488.38,
+    "predicted": 15749.3,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-15",
+    "actual": 16296.21,
+    "predicted": 15354.27,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-16",
+    "actual": 17400.04,
+    "predicted": 16721.75,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-17",
+    "actual": 17311.12,
+    "predicted": 16882.57,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-18",
+    "actual": 15814.04,
+    "predicted": 16956.47,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-19",
+    "actual": 15889.92,
+    "predicted": 17008.95,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-20",
+    "actual": 15332.5,
+    "predicted": 16835.82,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-21",
+    "actual": 13795.25,
+    "predicted": 15807.87,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-22",
+    "actual": 13479.33,
+    "predicted": 15412.51,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-23",
+    "actual": 15410.08,
+    "predicted": 16780.47,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-24",
+    "actual": 15890.54,
+    "predicted": 16941.34,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-25",
+    "actual": 16503.33,
+    "predicted": 17015.7,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-26",
+    "actual": 16474.25,
+    "predicted": 17068.33,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-27",
+    "actual": 15816.62,
+    "predicted": 16895.15,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-28",
+    "actual": 14113.08,
+    "predicted": 15867.19,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-29",
+    "actual": 13658.0,
+    "predicted": 15471.83,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-30",
+    "actual": 15368.08,
+    "predicted": 16839.8,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-31",
+    "actual": 15180.29,
+    "predicted": 17000.67,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-08-01",
+    "actual": 15151.17,
+    "predicted": 17075.05,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-08-02",
+    "actual": 15687.67,
+    "predicted": 17127.68,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-08-03",
+    "actual": 14809.0,
+    "predicted": 16954.5,
+    "model": "SARIMA"
+  },
+  {
+    "date": "2018-07-05",
+    "actual": 17609.0,
+    "predicted": 15777.1,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-06",
+    "actual": 15742.92,
+    "predicted": 15583.9,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-07",
+    "actual": 13610.33,
+    "predicted": 14487.89,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-08",
+    "actual": 13768.71,
+    "predicted": 14145.86,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-09",
+    "actual": 16427.33,
+    "predicted": 15831.09,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-10",
+    "actual": 17489.33,
+    "predicted": 16155.92,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-11",
+    "actual": 16714.12,
+    "predicted": 16194.9,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-12",
+    "actual": 16330.83,
+    "predicted": 16288.25,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-13",
+    "actual": 16911.29,
+    "predicted": 16118.32,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-14",
+    "actual": 16488.38,
+    "predicted": 15036.89,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-15",
+    "actual": 16296.21,
+    "predicted": 14700.42,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-16",
+    "actual": 17400.04,
+    "predicted": 16382.09,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-17",
+    "actual": 17311.12,
+    "predicted": 16694.38,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-18",
+    "actual": 15814.04,
+    "predicted": 16712.18,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-19",
+    "actual": 15889.92,
+    "predicted": 16776.31,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-20",
+    "actual": 15332.5,
+    "predicted": 16569.87,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-21",
+    "actual": 13795.25,
+    "predicted": 15445.56,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-22",
+    "actual": 13479.33,
+    "predicted": 15060.89,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-23",
+    "actual": 15410.08,
+    "predicted": 16690.23,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-24",
+    "actual": 15890.54,
+    "predicted": 16947.3,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-25",
+    "actual": 16503.33,
+    "predicted": 16908.26,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-26",
+    "actual": 16474.25,
+    "predicted": 16915.21,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-27",
+    "actual": 15816.62,
+    "predicted": 16652.47,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-28",
+    "actual": 14113.08,
+    "predicted": 15473.94,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-29",
+    "actual": 13658.0,
+    "predicted": 15038.17,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-30",
+    "actual": 15368.08,
+    "predicted": 16620.49,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-07-31",
+    "actual": 15180.29,
+    "predicted": 16835.39,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-08-01",
+    "actual": 15151.17,
+    "predicted": 16759.67,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-08-02",
+    "actual": 15687.67,
+    "predicted": 16735.83,
+    "model": "Prophet"
+  },
+  {
+    "date": "2018-08-03",
+    "actual": 14809.0,
+    "predicted": 16448.46,
+    "model": "Prophet"
+  }
+]
