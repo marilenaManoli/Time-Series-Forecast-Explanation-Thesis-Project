@@ -17,6 +17,7 @@ Seven forecasting models (Naive, Seasonal Naive, Linear Regression, ETS, HWES (d
 | 5. Structured explanations | `05_structured_explanations.ipynb` | `session05_structured_explanations.csv` |
 | 6. Narrative layer | `06_narrative_layer.ipynb` | `session06_narratives.csv` |
 | 7. Full pipeline | `07_full_pipeline.ipynb` | `session07_full_pipeline_summary.csv` |
+| 8. Sensitivity analysis | `08_sensitivity_analysis.ipynb` | — |
 
 ## Metrics
 
@@ -48,7 +49,7 @@ The React dashboard (`src/`) presents three views for each model:
 ## Structure
 
 ```
-notebooks/        full pipeline (01 → 07)
+notebooks/        full pipeline (01 → 08)
 src/
   components/     React dashboard components
   data/           pipeline outputs (gitignored)
@@ -67,7 +68,7 @@ pip install -r requirements.txt
 jupyter lab
 ```
 
-Run notebooks in order (01 → 07) from the `notebooks/` directory. Each notebook saves its outputs to `src/data/`.
+Run notebooks in order (01 → 08) from the `notebooks/` directory. Each notebook saves its outputs to `src/data/`. Notebook 08 (sensitivity analysis) validates the fuzzy threshold choices and produces no output files.
 
 ### Web App
 
