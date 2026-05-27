@@ -157,7 +157,7 @@ function EmptyState({ loading, onGoToNotebooks }) {
 }
 
 // ── Main component ──────────────────────────────────────────────────────────
-export default function ForecastDashboard({ metrics, forecasts, narratives, fuzzyLabels, loading, onGoToNotebooks }) {
+export default function ForecastDashboard({ metrics, forecasts, narratives, fuzzyLabels, sensitivity, loading, onGoToNotebooks }) {
   const [tab, setTab]                       = useState('metrics');  // metrics | explanations | narratives
   const [sortBy, setSortBy]                 = useState('MAE');
   const [activeMetricInfo, setActiveMetricInfo] = useState(null);
@@ -196,6 +196,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
     { id: 'metrics',      label: 'Metrics & quality' },
     { id: 'explanations', label: 'Linguistic explanations' },
     { id: 'narratives',   label: 'Narratives' },
+    { id: 'sensitivity',  label: 'Threshold sensitivity' },
   ];
 
   return (
@@ -435,6 +436,131 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
             }
           </>
         )}
+
+        {/* ── TAB: SENSITIVITY (session08 output) ── */}
+        {tab === 'sensitivity' && (() => {
+          const conf = sensitivity?.confidence;
+          const stability = sensitivity?.stability;
+          const METRICS = ['mae', 'mpe', 'mape', 'da'];
+          const LABELS  = ['MAE', 'MPE', 'MAPE', 'DA'];
+
+          // % of deltas where n_changed === 0, per metric
+          const stableRates = ['MAE', 'MAPE', 'DA'].map(m => {
+            const rows = stability?.filter(r => r.metric === m) || [];
+            const stable = rows.filter(r => r.n_changed === 0).length;
+            return { metric: m, pct: rows.length ? Math.round((stable / rows.length) * 100) : null };
+          });
+
+          const scoreColor = v => {
+            if (v >= 0.8) return { bg: '#EAF3DE', text: '#3B6D11' };
+            if (v >= 0.5) return { bg: '#FAEEDA', text: '#854F0B' };
+            return { bg: '#FAECE7', text: '#993C1D' };
+          };
+
+          return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* Intro */}
+              <div style={{ background: '#f9f8f4', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 10, padding: '1rem 1.25rem' }}>
+                <p style={{ fontSize: 14, fontWeight: 600, color: '#1a1a18', marginBottom: 6 }}>What is this?</p>
+                <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6, marginBottom: 8 }}>
+                  The fuzzy labels — like "low error" or "medium MAPE" — depend on where the thresholds are drawn. This tab asks: <strong>would the labels change if we had drawn the thresholds slightly differently?</strong>
+                </p>
+                <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>
+                  Each model gets a <strong>confidence score</strong> (0–1) showing how firmly it sits inside its assigned category. A score near 1 means the label is robust — it would not change even if thresholds were shifted by ±15%. A score near 0 means the model sits near a boundary and its label is less certain.
+                </p>
+              </div>
+
+              {/* Stability summary */}
+              {stableRates.some(r => r.pct !== null) && (
+                <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem' }}>
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 12 }}>
+                    Label stability — % of ±15% threshold shifts that produce no label changes
+                  </p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {stableRates.map(({ metric, pct }) => pct !== null && (
+                      <div key={metric} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                        <span style={{ width: 48, fontSize: 12, color: '#3d3d3a', fontWeight: 500 }}>{metric}</span>
+                        <div style={{ flex: 1, height: 14, background: 'rgba(0,0,0,0.06)', borderRadius: 3, overflow: 'hidden' }}>
+                          <div style={{ width: `${pct}%`, height: '100%', background: pct >= 60 ? '#639922' : pct >= 30 ? '#BA7517' : '#D85A30', borderRadius: 3 }} />
+                        </div>
+                        <span style={{ fontSize: 12, minWidth: 38, fontVariantNumeric: 'tabular-nums', color: '#1a1a18' }}>{pct}%</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p style={{ fontSize: 11, color: '#888780', marginTop: 10 }}>
+                    MAE thresholds are the most sensitive because several models cluster in the medium-error range. DA thresholds are the most stable.
+                  </p>
+                </div>
+              )}
+
+              {/* Confidence heatmap */}
+              {conf && (
+                <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem' }}>
+                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 12 }}>
+                    Membership confidence per model — how firmly each label is assigned
+                  </p>
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                      <thead>
+                        <tr style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
+                          <th style={{ padding: '8px 12px', textAlign: 'left',  fontSize: 11, fontWeight: 600, color: '#73726c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Model</th>
+                          {LABELS.map(l => (
+                            <th key={l} style={{ padding: '8px 12px', textAlign: 'center', fontSize: 11, fontWeight: 600, color: '#73726c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>{l}</th>
+                          ))}
+                          <th style={{ padding: '8px 12px', textAlign: 'left', fontSize: 11, fontWeight: 600, color: '#73726c', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Note</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {conf.map(row => {
+                          const scores = METRICS.map(m => row[m]);
+                          const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+                          const note = avgScore >= 0.75 ? 'Labels are robust'
+                                     : avgScore >= 0.5  ? 'Some labels near a boundary'
+                                     :                    'Several labels borderline';
+                          const noteColor = avgScore >= 0.75 ? '#3B6D11' : avgScore >= 0.5 ? '#854F0B' : '#993C1D';
+                          const modelColor = PALETTE[row.model] || '#888780';
+                          return (
+                            <tr key={row.model} style={{ borderBottom: '0.5px solid rgba(0,0,0,0.05)' }}>
+                              <td style={{ padding: '9px 12px', fontWeight: 500 }}>
+                                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+                                  <span style={{ width: 9, height: 9, borderRadius: '50%', background: modelColor, flexShrink: 0 }} />
+                                  {row.model}
+                                </span>
+                              </td>
+                              {METRICS.map(m => {
+                                const v = row[m];
+                                const c = scoreColor(v);
+                                return (
+                                  <td key={m} style={{ padding: '9px 12px', textAlign: 'center' }}>
+                                    <span style={{ background: c.bg, color: c.text, borderRadius: 5, padding: '2px 8px', fontSize: 12, fontWeight: 500, fontVariantNumeric: 'tabular-nums' }}>
+                                      {v.toFixed(2)}
+                                    </span>
+                                  </td>
+                                );
+                              })}
+                              <td style={{ padding: '9px 12px', fontSize: 12, color: noteColor }}>{note}</td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div style={{ display: 'flex', gap: 14, marginTop: 12, flexWrap: 'wrap' }}>
+                    {[['≥ 0.80 — robust', '#EAF3DE', '#3B6D11'], ['0.50–0.79 — borderline', '#FAEEDA', '#854F0B'], ['< 0.50 — near boundary', '#FAECE7', '#993C1D']].map(([l, bg, text]) => (
+                      <span key={l} style={{ background: bg, color: text, borderRadius: 5, padding: '2px 9px', fontSize: 11 }}>{l}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!sensitivity && (
+                <div style={{ padding: '2rem', textAlign: 'center', color: '#888780' }}>
+                  <p style={{ fontSize: 13 }}>Run notebook 08 to generate sensitivity data, then re-load the app.</p>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {/* ── TAB: NARRATIVES (session06 output) ── */}
         {tab === 'narratives' && (
