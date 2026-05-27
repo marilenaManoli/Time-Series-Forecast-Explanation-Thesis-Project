@@ -84,3 +84,7 @@ Open `http://localhost:5173`.
 Marilena Manoli  
 University of Bern, Institute of Computer Science  
 May 2026
+
+## AI Assistance Disclosure
+
+This project was developed with the assistance of Claude (Anthropic) as an AI coding tool. Claude was used to support implementation tasks including React component development, notebook code, and debugging. All research decisions, methodology design, analysis, and written content are the author's own work. Use of AI assistance is disclosed in accordance with the University of Bern's academic integrity guidelines.
