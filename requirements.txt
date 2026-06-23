@@ -6,8 +6,10 @@ numpy
 matplotlib
 seaborn
 scikit-learn
+scikit-fuzzy
 statsmodels
 prophet
 pmdarima
 openpyxl
 tqdm
+requests

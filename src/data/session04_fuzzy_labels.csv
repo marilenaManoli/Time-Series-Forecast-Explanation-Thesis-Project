@@ -4,5 +4,5 @@ Seasonal Naive,1352.16,1719.28,8.944,-0.571,59.77,medium error,neutral,medium ma
 Linear Regression,1238.04,1505.5,7.936,2.908,50.58,low error,slight overprediction,medium mape,low DA,"low error, slight overprediction"
 ETS,1546.33,1812.99,10.018,5.249,66.67,medium error,slight overprediction,medium mape,medium DA,"medium error, slight overprediction"
 HWES (damped),1517.14,1779.22,9.821,5.222,67.82,medium error,slight overprediction,medium mape,medium DA,"medium error, slight overprediction"
-SARIMA,1435.0,1704.85,9.209,4.487,66.67,medium error,slight overprediction,medium mape,medium DA,"medium error, slight overprediction"
+SARIMA,1434.99,1704.84,9.209,4.487,66.67,medium error,slight overprediction,medium mape,medium DA,"medium error, slight overprediction"
 Prophet,1091.53,1320.09,7.053,2.614,65.52,low error,slight overprediction,low mape,medium DA,"low error, slight overprediction"

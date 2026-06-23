@@ -908,19 +908,19 @@
   {
     "date": "2018-07-06",
     "actual": 15742.92,
-    "predicted": 16735.08,
+    "predicted": 16735.09,
     "model": "SARIMA"
   },
   {
     "date": "2018-07-07",
     "actual": 13610.33,
-    "predicted": 15719.06,
+    "predicted": 15719.05,
     "model": "SARIMA"
   },
   {
     "date": "2018-07-08",
     "actual": 13768.71,
-    "predicted": 15336.03,
+    "predicted": 15336.02,
     "model": "SARIMA"
   },
   {
@@ -944,7 +944,7 @@
   {
     "date": "2018-07-12",
     "actual": 16330.83,
-    "predicted": 16948.57,
+    "predicted": 16948.58,
     "model": "SARIMA"
   },
   {
@@ -986,7 +986,7 @@
   {
     "date": "2018-07-19",
     "actual": 15889.92,
-    "predicted": 17008.95,
+    "predicted": 17008.96,
     "model": "SARIMA"
   },
   {
@@ -1010,7 +1010,7 @@
   {
     "date": "2018-07-23",
     "actual": 15410.08,
-    "predicted": 16780.47,
+    "predicted": 16780.46,
     "model": "SARIMA"
   },
   {
@@ -1034,7 +1034,7 @@
   {
     "date": "2018-07-27",
     "actual": 15816.62,
-    "predicted": 16895.15,
+    "predicted": 16895.16,
     "model": "SARIMA"
   },
   {
@@ -1052,7 +1052,7 @@
   {
     "date": "2018-07-30",
     "actual": 15368.08,
-    "predicted": 16839.8,
+    "predicted": 16839.79,
     "model": "SARIMA"
   },
   {
