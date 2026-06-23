@@ -16,6 +16,21 @@ function biasLabel(mpe) {
     : { text: Math.abs(mpe) > 5 ? 'strongly under-forecasts' : 'slightly under-forecasts', dir: 'under' };
 }
 
+// Maps notebook 04's real CwW label vocabulary (session04_fuzzy_labels.csv) onto
+// the color tiers used by QUALITY/BIAS below, so real labels render with sensible colors.
+const MAPE_QUALITY_KEY = { 'low mape': 'good', 'medium mape': 'acceptable', 'high mape': 'poor' };
+const MPE_BIAS_KEY = { 'slight underprediction': 'under', neutral: 'neutral', 'slight overprediction': 'over' };
+
+// Per-metric "what counts as best" direction. MAE/RMSE/MAPE are error magnitudes (lower is
+// better). DA is a correctness rate (higher is better). MPE is a *signed* bias metric — the
+// best value is the one closest to zero in either direction, not the lowest/highest raw value.
+const BEST_DIRECTION = { MAE: 'lower', RMSE: 'lower', MAPE: 'lower', MPE: 'lower', DA: 'higher' };
+const normalizeForRanking = (metric, value) => (metric === 'MPE' ? Math.abs(value) : value);
+const rankScore = (metric, value) => {
+  const v = normalizeForRanking(metric, value);
+  return BEST_DIRECTION[metric] === 'higher' ? -v : v; // smaller rankScore = better, for every metric
+};
+
 // ── Design tokens ──────────────────────────────────────────────────────────
 const PALETTE = {
   'Naive':             '#7F77DD',
@@ -51,8 +66,8 @@ const EXPLANATIONS = {
 };
 
 // ── Small helpers ───────────────────────────────────────────────────────────
-function Badge({ label, colorMap }) {
-  const c = colorMap?.[label] || { bg: '#F1EFE8', text: '#5F5E5A', border: '#B4B2A9' };
+function Badge({ label, colorMap, colorKey }) {
+  const c = colorMap?.[colorKey ?? label] || { bg: '#F1EFE8', text: '#5F5E5A', border: '#B4B2A9' };
   return (
     <span style={{ background: c.bg, color: c.text, border: `1px solid ${c.border}`, borderRadius: 6, padding: '2px 9px', fontSize: 12, fontWeight: 500, whiteSpace: 'nowrap' }}>
       {label}
@@ -72,16 +87,18 @@ function Bar({ value, max, color }) {
 }
 
 function ModelBarChart({ data, metric }) {
-  const higherIsBetter = metric === 'DA';
-  const vals = data.map(d => d[metric]);
+  const higherIsBetter = BEST_DIRECTION[metric] === 'higher';
+  // Rank by |value| for MPE (closest-to-zero is best), raw value otherwise.
+  const vals = data.map(d => normalizeForRanking(metric, d[metric]));
   const minV = Math.min(...vals);
   const maxV = Math.max(...vals, minV + 0.001);
   const isPercent = ['MAPE', 'MPE', 'DA'].includes(metric);
   const fmt = v => isPercent ? `${v}%` : v;
 
   const barWidth = v => {
-    if (higherIsBetter) return Math.max(4, ((v - minV) / (maxV - minV)) * 100);
-    return Math.max(4, (1 - (v - minV) / (maxV - minV)) * 100);
+    const nv = normalizeForRanking(metric, v);
+    if (higherIsBetter) return Math.max(4, ((nv - minV) / (maxV - minV)) * 100);
+    return Math.max(4, (1 - (nv - minV) / (maxV - minV)) * 100);
   };
 
   return (
@@ -157,7 +174,7 @@ function EmptyState({ loading, onGoToNotebooks }) {
 }
 
 // ── Main component ──────────────────────────────────────────────────────────
-export default function ForecastDashboard({ metrics, forecasts, narratives, fuzzyLabels, sensitivity, loading, onGoToNotebooks }) {
+export default function ForecastDashboard({ metrics, forecasts, narratives, fuzzyLabels, sensitivity, llmNarratives, loading, onGoToNotebooks }) {
   const [tab, setTab]                       = useState('metrics');  // metrics | explanations | narratives
   const [sortBy, setSortBy]                 = useState('MAE');
   const [activeMetricInfo, setActiveMetricInfo] = useState(null);
@@ -171,19 +188,23 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
     return metrics.map((m, i) => {
       // Try to find matching fuzzy label row from session04 CSV
       const fl = fuzzyLabels?.find(r => r.model === m.model || r.Model === m.model);
+      const realMape = fl?.MAPE_Label;
+      const realMpe  = fl?.MPE_Label;
       return {
         ...m,
         color: PALETTE[m.model] || fallbackColor(i),
-        mapeLabel: fl?.mape_label || fl?.MAPE_label || mapeLabel(m.MAPE),
-        biasInfo:  biasLabel(m.MPE),
-        daLabel:   fl?.da_label   || fl?.DA_label   || daLabel(m.DA),
+        mapeLabel: realMape || mapeLabel(m.MAPE),
+        mapeQualityKey: realMape ? (MAPE_QUALITY_KEY[realMape] || 'acceptable') : mapeLabel(m.MAPE),
+        biasInfo: realMpe
+          ? { text: realMpe, dir: MPE_BIAS_KEY[realMpe] || 'neutral' }
+          : biasLabel(m.MPE),
+        daLabel: fl?.DA_Label || daLabel(m.DA),
       };
     });
   }, [metrics, fuzzyLabels]);
 
   const sorted = useMemo(() => {
-    const asc = ['MAE', 'RMSE', 'MAPE'].includes(sortBy);
-    return [...enriched].sort((a, b) => asc ? a[sortBy] - b[sortBy] : b[sortBy] - a[sortBy]);
+    return [...enriched].sort((a, b) => rankScore(sortBy, a[sortBy]) - rankScore(sortBy, b[sortBy]));
   }, [enriched, sortBy]);
 
   const maxMAE  = Math.max(...(sorted.map(d => d.MAE)),  1);
@@ -197,6 +218,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
     { id: 'explanations', label: 'Linguistic explanations' },
     { id: 'narratives',   label: 'Narratives' },
     { id: 'sensitivity',  label: 'Threshold sensitivity' },
+    { id: 'llm',          label: 'LLM Narrative' },
   ];
 
   return (
@@ -300,8 +322,8 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                                   {row.MPE > 0 ? '+' : ''}{row.MPE}%
                                 </td>
                                 <td style={{ padding: '10px 12px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{row.DA}%</td>
-                                <td style={{ padding: '10px 12px', textAlign: 'right' }}><Badge label={row.mapeLabel} colorMap={QUALITY} /></td>
-                                <td style={{ padding: '10px 12px', textAlign: 'right' }}><Badge label={row.biasInfo.text} colorMap={BIAS} /></td>
+                                <td style={{ padding: '10px 12px', textAlign: 'right' }}><Badge label={row.mapeLabel} colorMap={QUALITY} colorKey={row.mapeQualityKey} /></td>
+                                <td style={{ padding: '10px 12px', textAlign: 'right' }}><Badge label={row.biasInfo.text} colorMap={BIAS} colorKey={row.biasInfo.dir} /></td>
                               </tr>
                             );
                           })}
@@ -415,8 +437,8 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                           <span style={{ width: 10, height: 10, borderRadius: '50%', background: row.color }} />
                           <span style={{ fontWeight: 600, fontSize: 14, color: '#1a1a18' }}>{row.model}</span>
                           <span style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
-                            <Badge label={row.mapeLabel} colorMap={QUALITY} />
-                            <Badge label={bias.text} colorMap={BIAS} />
+                            <Badge label={row.mapeLabel} colorMap={QUALITY} colorKey={row.mapeQualityKey} />
+                            <Badge label={bias.text} colorMap={BIAS} colorKey={bias.dir} />
                           </span>
                         </div>
                         {structuredExp
@@ -424,7 +446,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                           : <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>
                               Accuracy is <strong>{row.mapeLabel}</strong> (MAPE = {row.MAPE}%).
                               Typical error is <strong>{row.MAE} units</strong> (MAE).
-                              The model {bias.text}{Math.abs(row.MPE) < 1 ? ', with no consistent direction of error' : ` by ${Math.abs(row.MPE).toFixed(1)}% on average`}.
+                              The model {biasLabel(row.MPE).text}{Math.abs(row.MPE) < 1 ? ', with no consistent direction of error' : ` by ${Math.abs(row.MPE).toFixed(1)}% on average`}.
                               Directional accuracy is <strong>{row.daLabel}</strong> ({row.DA}%).
                               {row.RMSE / row.MAE > 1.5 ? ' Large outlier errors present (RMSE ≫ MAE).' : ' No extreme outlier errors detected.'}
                             </p>
@@ -585,6 +607,55 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                           ? <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.7 }}>{narrative}</p>
                           : <p style={{ fontSize: 13, color: '#888780', fontStyle: 'italic' }}>
                               No narrative found for this model. Run notebook 06 to generate narratives, then re-load the app.
+                            </p>
+                        }
+                      </div>
+                    );
+                  })}
+                </div>
+            }
+          </>
+        )}
+
+        {/* ── TAB: LLM NARRATIVE (session09 output, RQ4 / format F4) ── */}
+        {tab === 'llm' && (
+          <>
+            {!hasMetrics
+              ? <EmptyState loading={loading} onGoToNotebooks={onGoToNotebooks} />
+              : <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                  <p style={{ fontSize: 13, color: '#73726c', marginBottom: 4 }}>
+                    The rule-based narrative (notebook 06) and an LLM-rephrased version (notebook 09, format F4) side by side, for comparison.
+                    {!llmNarratives && <span style={{ color: '#854f0b' }}> Run notebook 09 to populate this tab.</span>}
+                  </p>
+                  {sorted.map(row => {
+                    const llmRow = llmNarratives?.find(r => r.model === row.model);
+                    return (
+                      <div key={row.model} style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+                          <span style={{ width: 10, height: 10, borderRadius: '50%', background: row.color }} />
+                          <span style={{ fontWeight: 600, fontSize: 14, color: '#1a1a18' }}>{row.model}</span>
+                          {llmRow?.faithfulness_flag && (
+                            <span
+                              title={`Numbers in the LLM text not found in the source narrative: ${llmRow.flagged_numbers?.join(', ')}`}
+                              style={{ marginLeft: 'auto', background: '#FAEEDA', color: '#854F0B', border: '1px solid #BA7517', borderRadius: 6, padding: '2px 9px', fontSize: 11, fontWeight: 500, cursor: 'help' }}
+                            >
+                              ⚠ unverified number
+                            </span>
+                          )}
+                        </div>
+                        {llmRow
+                          ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                              <div>
+                                <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 4 }}>Rule-based (template)</p>
+                                <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{llmRow.template_narrative}</p>
+                              </div>
+                              <div>
+                                <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 4 }}>LLM-rephrased</p>
+                                <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{llmRow.llm_narrative}</p>
+                              </div>
+                            </div>
+                          : <p style={{ fontSize: 13, color: '#888780', fontStyle: 'italic' }}>
+                              No LLM narrative found for this model. Run notebook 09 to generate it, then re-load the app.
                             </p>
                         }
                       </div>

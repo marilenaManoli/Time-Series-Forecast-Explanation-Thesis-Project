@@ -11,6 +11,7 @@ export default function App() {
   const [narratives, setNarratives]         = useState(null);
   const [fuzzyLabels, setFuzzyLabels]       = useState(null);
   const [sensitivity, setSensitivity]       = useState(null);
+  const [llmNarratives, setLlmNarratives]   = useState(null);
   const [loading, setLoading]               = useState(true);
   const [selectedNotebookId, setSelectedNotebookId] = useState(steps?.[0]?.id || null);
 
@@ -43,12 +44,13 @@ export default function App() {
         } catch { return null; }
       };
 
-      const [m, f, n, fl, s] = await Promise.all([
+      const [m, f, n, fl, s, ln] = await Promise.all([
         tryFetch('/src/data/metrics_all_models.json'),
         tryFetch('/src/data/forecasts_all_models.json'),
         tryFetch('/src/data/session06_narratives.csv'),
         tryFetch('/src/data/session04_fuzzy_labels.csv'),
         tryFetch('/src/data/session08_sensitivity.json'),
+        tryFetch('/src/data/session09_llm_narratives.json'),
       ]);
 
       setMetrics(m);
@@ -56,6 +58,7 @@ export default function App() {
       setNarratives(n);
       setFuzzyLabels(fl);
       setSensitivity(s);
+      setLlmNarratives(ln);
       setLoading(false);
     };
     load();
@@ -96,6 +99,7 @@ export default function App() {
             narratives={narratives}
             fuzzyLabels={fuzzyLabels}
             sensitivity={sensitivity}
+            llmNarratives={llmNarratives}
             loading={loading}
             onGoToNotebooks={() => setView('notebooks')}
           />
