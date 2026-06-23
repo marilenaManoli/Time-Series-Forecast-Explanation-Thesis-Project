@@ -92,5 +92,19 @@ No formal ethics review is required for this design (no sensitive personal data,
 
 ## 8. Before you run this
 
-Given the bug fixes already applied (see `PROJECT_REPORT.md` §6), the dashboard now shows your actual CwW output rather than a substitute label scheme — so the feedback you collect will be about the real pipeline, not an artifact of the bug. The clean end-to-end re-run of all 9 notebooks was done on 2026-06-23 — every file in `src/data/` is current. Remaining step before the first session:
-1. Run one pilot session yourself (or with a friendly colleague) to check the task wording and timing feel natural — adjust before the real panel.
+Given the bug fixes already applied (see `PROJECT_REPORT.md` §6), the dashboard now shows your actual CwW output rather than a substitute label scheme — so the feedback you collect will be about the real pipeline, not an artifact of the bug. The clean end-to-end re-run of all 9 notebooks was done on 2026-06-23 — every file in `src/data/` is current. A mechanical dry-run of all 6 tasks against the live dashboard was also done on 2026-06-23 (§9) — it caught one issue that needs a decision before the real panel. Remaining step before the first session:
+1. **Run one pilot session with an actual human** (yourself or a friendly colleague) to get the part a mechanical dry-run can't: real reactions to the task wording, real timing under genuine think-aloud conditions, and the Likert items' actual usability. §9's dry-run checked whether the tasks are *performable*, not whether they *feel* natural — that still needs a person.
+
+## 9. Mechanical dry-run findings (2026-06-23)
+
+This was a scripted walkthrough of all 6 think-aloud tasks against the live dashboard — it checks whether each task is *technically performable as written*, not whether a human finds it clear or well-timed (that part still needs §8's human pilot). No console errors, all 5 tabs render, navigation works.
+
+**Critical finding — Task 4's blind comparison is not actually supported by the dashboard as built.** The task script says to show both narratives "without revealing which is which" before asking the participant to guess. But the LLM Narrative tab always displays the section headers "RULE-BASED (TEMPLATE)" and "LLM-REPHRASED" — so a participant reading the live tool sees the answer immediately; there's no toggle to hide it. Running the task as literally written would not produce the blind comparison the task is designed around. **You need to decide one of:**
+- Add a small "blind mode" to the LLM Narrative tab for the study (e.g. labels show "Version A" / "Version B," randomized per model, with a "Reveal" button the moderator clicks after the participant answers) — keeps the task running through the live tool.
+- Or work around it manually during sessions: prepare a separate handout/screenshot with the labels cropped out for this one task, and don't rely on the live tab until after the reveal.
+
+**Confirmed still accurate:** Task 5's premise ("point them at Linear Regression's row, lowest confidence scores") is still true against the current data — Linear Regression has the lowest confidence on all four metrics (0.31 / 0.44 / 0.31 / 0.13), well below every other model.
+
+**Timing:** total page-interaction overhead across all 6 tasks was about 1 second — confirms the 20-minute walkthrough budget isn't constrained by the tool itself; all of it is available for actual participant reading/talking time, which a mechanical dry-run can't simulate.
+
+**Found while re-running notebook 09 for this dry-run (not a dashboard issue, a pipeline one — see `PROJECT_REPORT.md` §4's notebook 09 section for full detail):** its output isn't deterministic — re-running it produces different LLM phrasing each time. **Do not re-run notebook 09 again before the real panel** — freeze the current `session09_llm_narratives.json` so every participant evaluates the same text. The re-run also produced three new, independent examples of the LLM adding an unstated evaluative judgment (e.g. "this bias isn't significant enough to cause major issues") with no number involved — strengthens the existing faithfulness-limitation note, doesn't change anything about the study design.
