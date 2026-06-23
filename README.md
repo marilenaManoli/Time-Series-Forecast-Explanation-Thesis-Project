@@ -17,7 +17,8 @@ Seven forecasting models (Naive, Seasonal Naive, Linear Regression, ETS, HWES (d
 | 5. Structured explanations | `05_structured_explanations.ipynb` | `session05_structured_explanations.csv` |
 | 6. Narrative layer | `06_narrative_layer.ipynb` | `session06_narratives.csv` |
 | 7. Full pipeline | `07_full_pipeline.ipynb` | `session07_full_pipeline_summary.csv` |
-| 8. Sensitivity analysis | `08_sensitivity_analysis.ipynb` | — |
+| 8. Sensitivity analysis | `08_sensitivity_analysis.ipynb` | `session08_sensitivity.json` |
+| 9. LLM-supported narrative (RQ4 / format F4) | `09_llm_narrative.ipynb` | `session09_llm_narratives.json` |
 
 ## Metrics
 
@@ -40,16 +41,18 @@ Membership functions (triangular) are calibrated to the AEP daily demand range:
 
 ## Dashboard
 
-The React dashboard (`src/`) presents three views for each model:
+The React dashboard (`src/`) presents four views for each model:
 
 1. **Metrics & quality** — comparison table + bar charts
 2. **Linguistic explanations** — fuzzy labels and structured explanation sentences
 3. **Narratives** — human-readable narrative summaries
+4. **Threshold sensitivity** — confidence heatmap and stability chart from notebook 08, validating the fuzzy threshold choices
+5. **LLM Narrative** — template narrative (notebook 06) and LLM-rephrased narrative (notebook 09) side by side, with a faithfulness flag if the LLM introduced an unverified number
 
 ## Structure
 
 ```
-notebooks/        full pipeline (01 → 08)
+notebooks/        full pipeline (01 → 09)
 src/
   components/     React dashboard components
   data/           pipeline outputs (gitignored)
@@ -68,7 +71,16 @@ pip install -r requirements.txt
 jupyter lab
 ```
 
-Run notebooks in order (01 → 08) from the `notebooks/` directory. Each notebook saves its outputs to `src/data/`. Notebook 08 (sensitivity analysis) validates the fuzzy threshold choices and produces no output files.
+Run notebooks in order (01 → 09). Each notebook saves its outputs to `src/data/`. Notebook 08 (sensitivity analysis) validates the fuzzy threshold choices and saves its results to `session08_sensitivity.json`.
+
+**Working directory note:** notebooks 03–09 use paths relative to `notebooks/` (the default if you open them from there). Notebooks 01 and 02 instead use paths relative to `src/` — open Jupyter with `src/` as the kernel's working directory for those two specifically, or they'll fail to find the input data.
+
+Notebook 09 (LLM-supported narrative, RQ4 / format F4) requires a local LLM via [Ollama](https://ollama.com) — no API key or cloud billing needed:
+
+```bash
+ollama pull llama3
+ollama serve   # if not already running
+```
 
 ### Web App
 
