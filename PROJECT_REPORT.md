@@ -139,7 +139,7 @@ A React + Vite app (`npm run dev`, then open `http://localhost:5173`) with **no 
 | Linguistic explanations | `session06_narratives.csv` (the `Structured_Explanation` column) | notebook 05's sentence per model |
 | Narratives | `session06_narratives.csv` (the `Narrative` column) | notebook 06's fuller paragraph per model |
 | Threshold sensitivity | `session08_sensitivity.json` | confidence heatmap + stability chart from notebook 08 |
-| LLM Narrative | `session09_llm_narratives.json` | template narrative vs. LLM-rephrased narrative side by side, with a faithfulness-flag badge |
+| LLM Narrative | `session09_llm_narratives.json` | template narrative vs. LLM-rephrased narrative side by side, with a faithfulness-flag badge, plus a "Blind mode" toggle (Version A/B, randomized per model, with a Reveal button) for evaluation Task 4 |
 
 The main file is `src/components/ForecastDashboard.jsx`. The top-level shell that fetches all the files and switches between this dashboard and a "Notebooks" browsing view is `src/App.jsx`; `src/components/NotebookWindow.jsx` and `StepWindow.jsx` render that notebook-browsing view, with the descriptive text for each notebook hand-written in `src/content/steps.js` (currently covers notebooks 01–07 only — see §6).
 

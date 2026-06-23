@@ -179,8 +179,21 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
   const [sortBy, setSortBy]                 = useState('MAE');
   const [activeMetricInfo, setActiveMetricInfo] = useState(null);
   const [selectedModel, setSelectedModel]   = useState(null);
+  const [blindMode, setBlindMode]           = useState(false); // LLM Narrative tab: evaluation Task 4 blind compare
+  const [blindRevealed, setBlindRevealed]   = useState(false);
+  const [blindSeed, setBlindSeed]           = useState(0); // bump to reshuffle for the next participant
 
   const hasMetrics = metrics && metrics.length > 0;
+
+  // Per-model coin flip deciding which side (template vs LLM) shows first under
+  // "Version A" while blind mode is on. Recomputes when llmNarratives first loads
+  // or when the moderator clicks "Reshuffle" (bumps blindSeed) — stays stable
+  // across re-renders in between, so the assignment doesn't shift mid-reading.
+  const blindSwap = useMemo(() => {
+    const map = {};
+    (llmNarratives || []).forEach(r => { map[r.model] = Math.random() < 0.5; });
+    return map;
+  }, [blindSeed, llmNarratives]);
 
   // Enrich metrics with CwW labels (prefer real fuzzy label data if available)
   const enriched = useMemo(() => {
@@ -627,14 +640,54 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                     The rule-based narrative (notebook 06) and an LLM-rephrased version (notebook 09, format F4) side by side, for comparison.
                     {!llmNarratives && <span style={{ color: '#854f0b' }}> Run notebook 09 to populate this tab.</span>}
                   </p>
+
+                  {/* Blind-mode controls, for evaluation Task 4 (EVALUATION_PLAN.md §4) */}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f9f8f4', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 10, padding: '0.6rem 0.9rem', marginBottom: 4 }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#3d3d3a', cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={blindMode}
+                        onChange={e => { setBlindMode(e.target.checked); setBlindRevealed(false); }}
+                      />
+                      Blind mode (hide which version is which)
+                    </label>
+                    {blindMode && (
+                      <>
+                        <button
+                          onClick={() => setBlindRevealed(true)}
+                          disabled={blindRevealed}
+                          style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '0.5px solid rgba(0,0,0,0.15)', background: blindRevealed ? '#f1efe8' : '#1a1a18', color: blindRevealed ? '#888780' : '#ffffff', cursor: blindRevealed ? 'default' : 'pointer', fontFamily: 'inherit' }}
+                        >
+                          Reveal
+                        </button>
+                        <button
+                          onClick={() => { setBlindSeed(s => s + 1); setBlindRevealed(false); }}
+                          style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '0.5px solid rgba(0,0,0,0.15)', background: '#ffffff', color: '#3d3d3a', cursor: 'pointer', fontFamily: 'inherit' }}
+                        >
+                          Reshuffle for next participant
+                        </button>
+                        <span style={{ fontSize: 11, color: '#888780' }}>{blindRevealed ? 'Revealed' : 'Hidden — Version A/B order is randomized per model'}</span>
+                      </>
+                    )}
+                  </div>
+
                   {sorted.map(row => {
                     const llmRow = llmNarratives?.find(r => r.model === row.model);
+                    const hiding = blindMode && !blindRevealed;
+                    const swapped = !!blindSwap[row.model];
+                    // first/second hold {label, text} in display order; in blind+hidden mode
+                    // the label is just "Version A"/"Version B", swapped per model so a
+                    // participant can't learn "A is always the rule-based one."
+                    const sides = llmRow ? (swapped
+                      ? [{ key: 'llm', label: 'LLM-rephrased', text: llmRow.llm_narrative }, { key: 'template', label: 'Rule-based (template)', text: llmRow.template_narrative }]
+                      : [{ key: 'template', label: 'Rule-based (template)', text: llmRow.template_narrative }, { key: 'llm', label: 'LLM-rephrased', text: llmRow.llm_narrative }]
+                    ) : [];
                     return (
                       <div key={row.model} style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
                           <span style={{ width: 10, height: 10, borderRadius: '50%', background: row.color }} />
                           <span style={{ fontWeight: 600, fontSize: 14, color: '#1a1a18' }}>{row.model}</span>
-                          {llmRow?.faithfulness_flag && (
+                          {!hiding && llmRow?.faithfulness_flag && (
                             <span
                               title={`Numbers in the LLM text not found in the source narrative: ${llmRow.flagged_numbers?.join(', ')}`}
                               style={{ marginLeft: 'auto', background: '#FAEEDA', color: '#854F0B', border: '1px solid #BA7517', borderRadius: 6, padding: '2px 9px', fontSize: 11, fontWeight: 500, cursor: 'help' }}
@@ -645,14 +698,14 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                         </div>
                         {llmRow
                           ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                              <div>
-                                <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 4 }}>Rule-based (template)</p>
-                                <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{llmRow.template_narrative}</p>
-                              </div>
-                              <div>
-                                <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 4 }}>LLM-rephrased</p>
-                                <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{llmRow.llm_narrative}</p>
-                              </div>
+                              {sides.map((side, i) => (
+                                <div key={side.key}>
+                                  <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 4 }}>
+                                    {hiding ? `Version ${i === 0 ? 'A' : 'B'}` : `Version ${i === 0 ? 'A' : 'B'} — ${side.label}`}
+                                  </p>
+                                  <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{side.text}</p>
+                                </div>
+                              ))}
                             </div>
                           : <p style={{ fontSize: 13, color: '#888780', fontStyle: 'italic' }}>
                               No LLM narrative found for this model. Run notebook 09 to generate it, then re-load the app.
