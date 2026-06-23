@@ -55,7 +55,8 @@ The React dashboard (`src/`) presents four views for each model:
 notebooks/        full pipeline (01 → 09)
 src/
   components/     React dashboard components
-  data/           pipeline outputs (gitignored)
+  content/        hand-written Notebooks-tab content (steps.js)
+  data/           pipeline outputs (gitignored, except a few already-tracked files)
   styles/         CSS
 requirements.txt  Python dependencies
 ```

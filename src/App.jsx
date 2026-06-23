@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import NotebookWindow from './components/NotebookWindow';
 import ForecastDashboard from './components/ForecastDashboard';
-import { steps } from './data/steps';
+import { steps } from './content/steps';
 import './styles/app.css';
 
 export default function App() {
