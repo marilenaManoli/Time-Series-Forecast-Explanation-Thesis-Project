@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 
 // ── Computing with Words — fuzzy linguistic labels ─────────────────────────
 function cww(value, thresholds, labels) {
@@ -63,6 +63,45 @@ const EXPLANATIONS = {
   MAPE: { name: 'MAPE — Mean Absolute Percentage Error', body: 'Error expressed as a percentage of the actual value. Makes comparison across models and datasets easier. Under 1% is excellent; above 5% is poor for energy forecasting.',         formula: 'mean(|actual − predicted| / actual) × 100', unit: '%', caution: 'Asymmetric and unreliable when actual values are near zero.' },
   MPE:  { name: 'MPE — Mean Percentage Error (bias)',    body: 'The signed version of MAPE. Positive = model tends to predict too high (over-forecast); negative = predicts too low. Near zero means no systematic bias. This is your bias detector.', formula: 'mean((actual − predicted) / actual) × 100', unit: '%', caution: 'Positive and negative errors cancel, hiding some problems.' },
   DA:   { name: 'DA — Directional Accuracy',             body: 'Percentage of steps where the model correctly predicted whether demand would go up or down, regardless of magnitude. 50% = no better than a coin flip. Relevant for operational scheduling.', formula: '% steps where sign(Δactual) = sign(Δpredicted)', unit: '%', caution: 'Ignores magnitude entirely — a tiny correct step counts the same as a large one.' },
+};
+
+// ── Model class profiles (hand-authored; not derived from data) ────────────
+const MODEL_PROFILES = {
+  'Naive': {
+    strengths: 'Zero-cost statistical lower bound; always available without training.',
+    limitations: 'Ignores all patterns — trend, seasonality, autocorrelation. Valid only as a sanity-check floor.',
+    use: 'Use as a minimum-bar comparison only; not suitable for operational decisions.',
+  },
+  'Seasonal Naive': {
+    strengths: 'Captures weekly/daily seasonality with no trainable parameters. Fully interpretable and fast.',
+    limitations: 'Cannot model trend or irregular demand; degrades when seasonal patterns shift.',
+    use: 'Strong baseline for stable, highly seasonal demand. This dataset\'s reference model for skill-score comparison.',
+  },
+  'Linear Regression': {
+    strengths: 'Transparent and auditable — individual coefficient contributions are directly inspectable.',
+    limitations: 'Assumes a linear relationship; cannot capture non-linearities or complex seasonality without feature engineering.',
+    use: 'Best suited for trend-dominated series with stable structure; use caution when demand is non-linear or seasonal.',
+  },
+  'ETS': {
+    strengths: 'Handles trend and seasonality via exponential smoothing; adapts gradually to level changes.',
+    limitations: 'Additive/multiplicative structure is selected at fit time and cannot change mid-series.',
+    use: 'Suitable for medium-term scheduling on stable to moderately volatile demand patterns.',
+  },
+  'HWES (damped)': {
+    strengths: 'Damped-trend variant of Holt-Winters — avoids over-extrapolating trends, reducing long-horizon error.',
+    limitations: 'Still exponential-smoothing family; limited capacity for complex multi-seasonal patterns.',
+    use: 'Preferred when a trend is present but expected to flatten; good for 1–4 week planning horizons.',
+  },
+  'SARIMA': {
+    strengths: 'Principled statistical model capturing autoregressive, moving-average, and seasonal structure simultaneously.',
+    limitations: 'Parameter selection (p,d,q,P,D,Q) requires domain expertise or automated search; heavier to fit.',
+    use: 'Suitable for stationary or differenced series with clear autocorrelation; use caution during demand regime changes.',
+  },
+  'Prophet': {
+    strengths: 'Handles multiple seasonalities, trend changepoints, and holiday effects out of the box; robust to missing data.',
+    limitations: 'Changepoints may be over- or under-fit; less reliable on short or highly irregular series.',
+    use: 'Best for longer series with holiday/event effects; more appropriate for capacity planning than operational dispatch.',
+  },
 };
 
 // ── Small helpers ───────────────────────────────────────────────────────────
@@ -183,6 +222,25 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
   const [blindRevealed, setBlindRevealed]   = useState(false);
   const [blindSeed, setBlindSeed]           = useState(0); // bump to reshuffle for the next participant
 
+  // ── Timed-reveal test mode (sensitivity table) ──────────────────────────────
+  const [testPhase, setTestPhase]       = useState('idle'); // idle | running | done
+  const [testCountdown, setTestCountdown] = useState(10);
+  const testTimerRef = useRef(null);
+  useEffect(() => {
+    if (testPhase !== 'running') return;
+    setTestCountdown(10);
+    let remaining = 10;
+    testTimerRef.current = setInterval(() => {
+      remaining -= 1;
+      setTestCountdown(remaining);
+      if (remaining <= 0) {
+        clearInterval(testTimerRef.current);
+        setTestPhase('done');
+      }
+    }, 1000);
+    return () => clearInterval(testTimerRef.current);
+  }, [testPhase]);
+
   const hasMetrics = metrics && metrics.length > 0;
 
   // Per-model coin flip deciding which side (template vs LLM) shows first under
@@ -222,6 +280,9 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
 
   const maxMAE  = Math.max(...(sorted.map(d => d.MAE)),  1);
   const maxRMSE = Math.max(...(sorted.map(d => d.RMSE)), 1);
+
+  // Skill score baseline — Seasonal Naive; null if not present in data
+  const skillBaseline = useMemo(() => enriched.find(m => m.model === 'Seasonal Naive') ?? null, [enriched]);
 
   const selected     = selectedModel ? sorted.find(d => d.model === selectedModel) : null;
   const selForecasts = useMemo(() => forecasts?.filter(f => f.model === selectedModel).slice(0, 30) || [], [forecasts, selectedModel]);
@@ -316,6 +377,10 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                         <tbody>
                           {sorted.map((row, idx) => {
                             const isSel = selectedModel === row.model;
+                            const isBaseline = row.model === 'Seasonal Naive';
+                            const skillMAE  = skillBaseline && !isBaseline ? (1 - row.MAE  / skillBaseline.MAE)  * 100 : null;
+                            const skillRMSE = skillBaseline && !isBaseline ? (1 - row.RMSE / skillBaseline.RMSE) * 100 : null;
+                            const fmtSkill  = v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}% vs. SNaive`;
                             return (
                               <tr key={row.model}
                                 onClick={() => setSelectedModel(isSel ? null : row.model)}
@@ -326,10 +391,17 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                                     <span style={{ width: 10, height: 10, borderRadius: '50%', background: row.color, flexShrink: 0 }} />
                                     {idx === 0 && <span style={{ fontSize: 10, background: '#EAF3DE', color: '#3B6D11', border: '0.5px solid #639922', borderRadius: 4, padding: '1px 6px', marginRight: 2 }}>best</span>}
                                     {row.model}
+                                    {isBaseline && <span style={{ fontSize: 10, color: '#888780' }}>(baseline)</span>}
                                   </span>
                                 </td>
-                                <td style={{ padding: '10px 12px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{row.MAE}</td>
-                                <td style={{ padding: '10px 12px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{row.RMSE}</td>
+                                <td style={{ padding: '10px 12px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                                  {row.MAE}
+                                  {skillMAE !== null && <span style={{ display: 'block', fontSize: 10, color: skillMAE >= 0 ? '#3B6D11' : '#993C1D', marginTop: 1 }}>{fmtSkill(skillMAE)}</span>}
+                                </td>
+                                <td style={{ padding: '10px 12px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>
+                                  {row.RMSE}
+                                  {skillRMSE !== null && <span style={{ display: 'block', fontSize: 10, color: skillRMSE >= 0 ? '#3B6D11' : '#993C1D', marginTop: 1 }}>{fmtSkill(skillRMSE)}</span>}
+                                </td>
                                 <td style={{ padding: '10px 12px', textAlign: 'right', fontVariantNumeric: 'tabular-nums' }}>{row.MAPE}%</td>
                                 <td style={{ padding: '10px 12px', textAlign: 'right', fontVariantNumeric: 'tabular-nums', color: row.MPE > 1 ? '#D85A30' : row.MPE < -1 ? '#185FA5' : '#73726c' }}>
                                   {row.MPE > 0 ? '+' : ''}{row.MPE}%
@@ -464,6 +536,22 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                               {row.RMSE / row.MAE > 1.5 ? ' Large outlier errors present (RMSE ≫ MAE).' : ' No extreme outlier errors detected.'}
                             </p>
                         }
+                        {MODEL_PROFILES[row.model] && (() => {
+                          const p = MODEL_PROFILES[row.model];
+                          return (
+                            <div style={{ borderTop: '0.5px solid rgba(0,0,0,0.09)', marginTop: 12, paddingTop: 12, background: '#f9f8f4', borderRadius: '0 0 8px 8px', margin: '12px -1.25rem -1rem', padding: '12px 1.25rem 1rem' }}>
+                              <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#888780', fontWeight: 600, marginBottom: 8 }}>Model profile</p>
+                              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 8 }}>
+                                {[['Strengths', p.strengths], ['Limitations', p.limitations], ['Recommended use', p.use]].map(([label, text]) => (
+                                  <div key={label} style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 7, padding: '8px 10px' }}>
+                                    <p style={{ margin: '0 0 3px', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600 }}>{label}</p>
+                                    <p style={{ margin: 0, fontSize: 12, color: '#3d3d3a', lineHeight: 1.5 }}>{text}</p>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     );
                   })}
@@ -531,10 +619,44 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
               {/* Confidence heatmap */}
               {conf && (
                 <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem' }}>
-                  <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 12 }}>
-                    Membership confidence per model — how firmly each label is assigned
-                  </p>
-                  <div style={{ overflowX: 'auto' }}>
+                  {/* Header row: section label + test-mode controls */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, margin: 0 }}>
+                      Membership confidence per model — how firmly each label is assigned
+                    </p>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      {testPhase === 'running' && (
+                        <span style={{ fontSize: 12, fontVariantNumeric: 'tabular-nums', background: '#1a1a18', color: '#fff', borderRadius: 6, padding: '2px 10px', minWidth: 28, textAlign: 'center' }}>
+                          {testCountdown}s
+                        </span>
+                      )}
+                      {testPhase === 'idle' && (
+                        <button onClick={() => setTestPhase('running')} style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', color: '#444' }}>
+                          ▶ Test mode
+                        </button>
+                      )}
+                      {testPhase === 'done' && (
+                        <button onClick={() => { setTestPhase('idle'); setTestCountdown(10); }} style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, border: '1px solid #ccc', background: '#f5f5f5', cursor: 'pointer', color: '#444' }}>
+                          ↺ Reset
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  {/* Cross-model comparison warning */}
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: 8, padding: '10px 14px', marginBottom: 14 }}>
+                    <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>⚠</span>
+                    <p style={{ fontSize: 13, color: '#78350F', lineHeight: 1.55, margin: 0, fontWeight: 500 }}>
+                      <strong>Scores are not comparable across models.</strong> Each confidence score reflects only how firmly <em>that model's own label</em> was assigned — a higher score does not mean the model is more accurate or trustworthy than another. Compare scores within a single row only.
+                    </p>
+                  </div>
+                  {/* Time's-up overlay */}
+                  {testPhase === 'done' && (
+                    <div style={{ background: '#1a1a18', borderRadius: 8, padding: '2rem', textAlign: 'center', marginBottom: 14 }}>
+                      <p style={{ color: '#fff', fontSize: 15, fontWeight: 600, margin: '0 0 6px' }}>Time's up</p>
+                      <p style={{ color: '#aaa', fontSize: 13, margin: 0 }}>What did you think these numbers meant?</p>
+                    </div>
+                  )}
+                  <div style={{ overflowX: 'auto', filter: testPhase === 'done' ? 'blur(6px)' : 'none', pointerEvents: testPhase === 'done' ? 'none' : 'auto', transition: 'filter 0.4s' }}>
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
                       <thead>
                         <tr style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
@@ -555,7 +677,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                           const noteColor = avgScore >= 0.75 ? '#3B6D11' : avgScore >= 0.5 ? '#854F0B' : '#993C1D';
                           const modelColor = PALETTE[row.model] || '#888780';
                           return (
-                            <tr key={row.model} style={{ borderBottom: '0.5px solid rgba(0,0,0,0.05)' }}>
+                            <tr key={row.model} style={{ borderBottom: '0.5px solid rgba(0,0,0,0.05)', borderLeft: `3px solid ${modelColor}` }}>
                               <td style={{ padding: '9px 12px', fontWeight: 500 }}>
                                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7 }}>
                                   <span style={{ width: 9, height: 9, borderRadius: '50%', background: modelColor, flexShrink: 0 }} />
