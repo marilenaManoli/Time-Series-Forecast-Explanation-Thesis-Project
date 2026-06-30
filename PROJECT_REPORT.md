@@ -1,7 +1,7 @@
 # Project Report: Time Series Forecast Explanation using Computing with Words
 
 **Author:** Marilena Manoli — Master's thesis, University of Bern, Institute of Computer Science, 2026
-**Last updated:** 2026-06-22
+**Last updated:** 2026-06-30
 
 **How to use this document:** it's written so that someone with no prior knowledge of the project can read a section and then open the matching file (notebook, component, or data file) and see exactly what's being described. Every claim below names the specific file it comes from. Read this top to bottom for the full picture, or jump to §5 for "what does this project actually conclude" or §6 for "what's broken / what's already been fixed."
 
@@ -135,10 +135,10 @@ A React + Vite app (`npm run dev`, then open `http://localhost:5173`) with **no 
 
 | Tab | Reads | Shows |
 |---|---|---|
-| Metrics & quality | `metrics_all_models.json`, `session04_fuzzy_labels.csv` | sortable table of all 7 models, bar chart, click a row to see its forecast-vs-actual mini chart |
-| Linguistic explanations | `session06_narratives.csv` (the `Structured_Explanation` column) | notebook 05's sentence per model |
+| Metrics & quality | `metrics_all_models.json`, `session04_fuzzy_labels.csv` | sortable table of all 7 models + bar chart; MAE and RMSE cells include a skill score vs. Seasonal Naive baseline (e.g. "+19% vs. SNaive", green/red), computed as `(1 − model_error / baseline_error) × 100` — not routed through the CwW pipeline; click a row to see its forecast-vs-actual mini chart |
+| Linguistic explanations | `session06_narratives.csv` (the `Structured_Explanation` column) | notebook 05's sentence per model, followed by a hand-authored **Model profile** block (Strengths / Limitations / Recommended use) for each model class, visually separated from the data-derived text by a rule and a grey background |
 | Narratives | `session06_narratives.csv` (the `Narrative` column) | notebook 06's fuller paragraph per model |
-| Threshold sensitivity | `session08_sensitivity.json` | confidence heatmap + stability chart from notebook 08 |
+| Threshold sensitivity | `session08_sensitivity.json` | confidence heatmap + stability chart from notebook 08; an amber ⚠ comparability warning above the table explicitly states scores are not comparable across models; each confidence row has a per-model colour-coded left border; a moderator **Test mode** button triggers a 10-second timed reveal (countdown → blur + prompt → reset) for use during moderated evaluation sessions |
 | LLM Narrative | `session09_llm_narratives.json` | template narrative vs. LLM-rephrased narrative side by side, with a faithfulness-flag badge, plus a "Blind mode" toggle (Version A/B, randomized per model, with a Reveal button) for evaluation Task 4 |
 
 The main file is `src/components/ForecastDashboard.jsx`. The top-level shell that fetches all the files and switches between this dashboard and a "Notebooks" browsing view is `src/App.jsx`; `src/components/NotebookWindow.jsx` and `StepWindow.jsx` render that notebook-browsing view, with the descriptive text for each notebook hand-written in `src/content/steps.js` (currently covers notebooks 01–07 only — see §6).
@@ -166,6 +166,14 @@ The main file is `src/components/ForecastDashboard.jsx`. The top-level shell tha
 - **The MPE sign convention** described in §2 is consistent throughout the code but easy to misread; worth one explicit sentence about it in the thesis write-up so a reader doesn't mistake it for an error.
 
 None of the remaining items require a redesign — they're all small, contained fixes.
+
+### Added 2026-06-30 (ahead of engineering-practitioner interview)
+
+8. **Skill score column (Metrics tab):** a derived `skill_score = (1 − model_error / baseline_error) × 100` is now computed for MAE and RMSE using Seasonal Naive as the reference baseline, and displayed as small coloured sub-lines directly under each model's MAE/RMSE value in the metrics table (green for improvement, red for worse than baseline). Seasonal Naive itself is labelled "(baseline)" instead. Not routed through the CwW fuzzy pipeline — raw percentage only.
+
+9. **Model-class metadata (Linguistic Explanations tab):** a hand-authored `MODEL_PROFILES` lookup covers all 7 models, each with three fields: Strengths, Limitations, and Recommended use. Rendered as a visually distinct "Model profile" block at the bottom of each model's card in the Linguistic Explanations tab — light grey background, thin top rule, three white sub-cards — clearly separated from the data-derived CwW explanation text above it. This is deliberately labelled "Model profile" to distinguish it from the CwW-generated explanation and to signal that it comes from prior knowledge, not from the pipeline.
+
+10. **Threshold Sensitivity — comparability warning + timed-reveal test mode:** (a) an amber ⚠ banner above the confidence heatmap explicitly states "Scores are not comparable across models" after a real user misread the table during a pilot session; (b) each row in the heatmap has a 3 px left border in its model's palette colour to structurally discourage cross-row reading; (c) a moderator-facing "Test mode" button in the card header starts a 10-second timed reveal — the countdown badge ticks down from 10s, then the table blurs automatically and a dark "Time's up / What did you think these numbers meant?" overlay appears; a "Reset" button restores the idle state for the next participant without reloading the page. None of these changes alter the CwW pipeline or the comparability-caption text.
 
 ## 7. Suggested next steps
 

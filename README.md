@@ -41,13 +41,13 @@ Membership functions (triangular) are calibrated to the AEP daily demand range:
 
 ## Dashboard
 
-The React dashboard (`src/`) presents four views for each model:
+The React dashboard (`src/`) presents five views for each model:
 
-1. **Metrics & quality** — comparison table + bar charts
-2. **Linguistic explanations** — fuzzy labels and structured explanation sentences
-3. **Narratives** — human-readable narrative summaries
-4. **Threshold sensitivity** — confidence heatmap and stability chart from notebook 08, validating the fuzzy threshold choices
-5. **LLM Narrative** — template narrative (notebook 06) and LLM-rephrased narrative (notebook 09) side by side, with a faithfulness flag if the LLM introduced an unverified number
+1. **Metrics & quality** — sortable comparison table + bar chart; MAE and RMSE cells include a skill score vs. Seasonal Naive baseline (e.g. "+19% vs. SNaive"), computed as `(1 − model_error / baseline_error) × 100`
+2. **Linguistic explanations** — CwW-derived fuzzy labels and structured explanation sentences, followed by a hand-authored **Model profile** block (Strengths / Limitations / Recommended use) per model class
+3. **Narratives** — human-readable narrative summaries (notebook 06)
+4. **Threshold sensitivity** — confidence heatmap and stability chart from notebook 08; includes a comparability warning, per-model colour borders, and a moderator **Test mode** (10 s timed reveal with blur + reset) for evaluation sessions
+5. **LLM Narrative** — template narrative (notebook 06) and LLM-rephrased narrative (notebook 09) side by side, with a faithfulness flag if the LLM introduced an unverified number; Blind mode for Task 4 evaluation
 
 ## Structure
 
