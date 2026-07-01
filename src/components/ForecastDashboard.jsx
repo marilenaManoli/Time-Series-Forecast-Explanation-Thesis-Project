@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
+import ForecastPlot from './ForecastPlot';
 
 // ── Computing with Words — fuzzy linguistic labels ─────────────────────────
 function cww(value, thresholds, labels) {
@@ -536,6 +537,11 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                               {row.RMSE / row.MAE > 1.5 ? ' Large outlier errors present (RMSE ≫ MAE).' : ' No extreme outlier errors detected.'}
                             </p>
                         }
+                        {forecasts && forecasts.length > 0 && (
+                          <div style={{ borderTop: '1px solid #E5E7EB', borderBottom: '1px solid #E5E7EB', margin: '12px 0', padding: '12px 0' }}>
+                            <ForecastPlot forecastData={forecasts} modelName={row.model} accentColor={row.color} />
+                          </div>
+                        )}
                         {MODEL_PROFILES[row.model] && (() => {
                           const p = MODEL_PROFILES[row.model];
                           return (
