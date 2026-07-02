@@ -105,6 +105,48 @@ const MODEL_PROFILES = {
   },
 };
 
+// ── Word-level diff (template → LLM), LLM Narrative tab ────────────────────
+// Plain LCS alignment over whitespace-split words — good enough for short,
+// single-paragraph narratives; not meant to handle arbitrary text reflow.
+function diffWords(oldText, newText) {
+  const oldWords = oldText.split(/\s+/).filter(Boolean);
+  const newWords = newText.split(/\s+/).filter(Boolean);
+  const n = oldWords.length, m = newWords.length;
+  const dp = Array.from({ length: n + 1 }, () => new Array(m + 1).fill(0));
+  for (let i = n - 1; i >= 0; i--) {
+    for (let j = m - 1; j >= 0; j--) {
+      dp[i][j] = oldWords[i] === newWords[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    }
+  }
+  const tokens = [];
+  let i = 0, j = 0;
+  while (i < n && j < m) {
+    if (oldWords[i] === newWords[j]) { tokens.push({ type: 'equal', text: newWords[j] }); i++; j++; }
+    else if (dp[i + 1][j] >= dp[i][j + 1]) { tokens.push({ type: 'removed', text: oldWords[i] }); i++; }
+    else { tokens.push({ type: 'added', text: newWords[j] }); j++; }
+  }
+  while (i < n) { tokens.push({ type: 'removed', text: oldWords[i] }); i++; }
+  while (j < m) { tokens.push({ type: 'added', text: newWords[j] }); j++; }
+  return tokens;
+}
+
+function NarrativeDiff({ templateText, llmText }) {
+  const tokens = useMemo(() => diffWords(templateText, llmText), [templateText, llmText]);
+  const hasChanges = tokens.some(t => t.type !== 'equal');
+  if (!hasChanges) {
+    return <p style={{ fontSize: 13, color: '#888780', fontStyle: 'italic', margin: 0 }}>No differences detected between template and LLM version.</p>;
+  }
+  return (
+    <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.9, margin: 0 }}>
+      {tokens.map((t, i) => {
+        if (t.type === 'equal') return <span key={i}>{t.text}{' '}</span>;
+        if (t.type === 'removed') return <span key={i} style={{ textDecoration: 'line-through', color: '#FCA5A5' }}>{t.text}{' '}</span>;
+        return <span key={i} style={{ background: '#FEF08A', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.25)', borderRadius: 2 }}>{t.text}{' '}</span>;
+      })}
+    </p>
+  );
+}
+
 // ── Small helpers ───────────────────────────────────────────────────────────
 function Badge({ label, colorMap, colorKey }) {
   const c = colorMap?.[colorKey ?? label] || { bg: '#F1EFE8', text: '#5F5E5A', border: '#B4B2A9' };
@@ -926,16 +968,27 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                           )}
                         </div>
                         {llmRow
-                          ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-                              {sides.map((side, i) => (
-                                <div key={side.key}>
-                                  <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 4 }}>
-                                    {hiding ? `Version ${i === 0 ? 'A' : 'B'}` : `Version ${i === 0 ? 'A' : 'B'} — ${side.label}`}
-                                  </p>
-                                  <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{side.text}</p>
+                          ? (hiding
+                              ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                  {sides.map((side, i) => (
+                                    <div key={side.key}>
+                                      <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 4 }}>
+                                        {`Version ${i === 0 ? 'A' : 'B'}`}
+                                      </p>
+                                      <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{side.text}</p>
+                                    </div>
+                                  ))}
                                 </div>
-                              ))}
-                            </div>
+                              : <div>
+                                  <p style={{ fontSize: 11, color: '#888780', marginBottom: 8 }}>
+                                    Changes from template to LLM version:{' '}
+                                    <span style={{ background: '#FEF08A', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.25)', borderRadius: 2, padding: '0 3px' }}>yellow = changed/added</span>
+                                    {' '}
+                                    <span style={{ textDecoration: 'line-through', color: '#FCA5A5' }}>strikethrough = removed</span>
+                                  </p>
+                                  <NarrativeDiff templateText={llmRow.template_narrative} llmText={llmRow.llm_narrative} />
+                                </div>
+                            )
                           : <p style={{ fontSize: 13, color: '#888780', fontStyle: 'italic' }}>
                               No LLM narrative found for this model. Run notebook 09 to generate it, then re-load the app.
                             </p>
