@@ -172,6 +172,24 @@ function SortBtn({ label, active, onClick }) {
   );
 }
 
+function ModelFilterBar({ showAllModels, onToggle, visibleCount, totalCount, visibleNames }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', marginBottom: 14 }}>
+      <span style={{ fontSize: 12, color: '#888780' }}>
+        {showAllModels
+          ? `Showing all ${totalCount} models`
+          : `Showing ${visibleCount} of ${totalCount} models — ${visibleNames.join(' + ')}`}
+      </span>
+      <button onClick={onToggle} style={{
+        background: '#ffffff', color: '#185FA5', border: '0.5px solid rgba(24,95,165,0.35)',
+        borderRadius: 6, padding: '4px 11px', fontSize: 12, cursor: 'pointer', fontWeight: 500, fontFamily: 'inherit',
+      }}>
+        {showAllModels ? `Show fewer (baseline + best)` : `Show all ${totalCount} models`}
+      </button>
+    </div>
+  );
+}
+
 function MetricInfo({ metricKey, onClose }) {
   const info = EXPLANATIONS[metricKey];
   if (!info) return null;
@@ -219,6 +237,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
   const [sortBy, setSortBy]                 = useState('MAE');
   const [activeMetricInfo, setActiveMetricInfo] = useState(null);
   const [selectedModel, setSelectedModel]   = useState(null);
+  const [showAllModels, setShowAllModels]   = useState(false); // model pre-selection filter, shared by Metrics + Linguistic Explanations tabs
   const [blindMode, setBlindMode]           = useState(false); // LLM Narrative tab: evaluation Task 4 blind compare
   const [blindRevealed, setBlindRevealed]   = useState(false);
   const [blindSeed, setBlindSeed]           = useState(0); // bump to reshuffle for the next participant
@@ -308,7 +327,24 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
     return full.split(/(?<=[.!?])\s/)[0];
   }, [bestModel, narratives]);
 
-  const selected     = selectedModel ? sorted.find(d => d.model === selectedModel) : null;
+  // Model pre-selection filter — default view is baseline (Seasonal Naive) + the current
+  // best-ranked model (via rankScore(), same `bestModel` the top banner uses), expandable
+  // to all models with one click. Shared between the Metrics and Linguistic Explanations
+  // tabs; Threshold Sensitivity and LLM Narrative tabs read `sorted`/`enriched` directly
+  // and are untouched by this filter.
+  const defaultVisibleModelNames = useMemo(() => {
+    const names = new Set();
+    if (skillBaseline) names.add(skillBaseline.model);
+    if (bestModel) names.add(bestModel.model);
+    return names;
+  }, [skillBaseline, bestModel]);
+
+  const visibleSorted = useMemo(() => {
+    if (showAllModels) return sorted;
+    return sorted.filter(row => defaultVisibleModelNames.has(row.model));
+  }, [sorted, showAllModels, defaultVisibleModelNames]);
+
+  const selected     = selectedModel ? visibleSorted.find(d => d.model === selectedModel) : null;
   const selForecasts = useMemo(() => forecasts?.filter(f => f.model === selectedModel).slice(0, 30) || [], [forecasts, selectedModel]);
 
   const TABS = [
@@ -378,6 +414,15 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
             {!hasMetrics
               ? <EmptyState loading={loading} onGoToNotebooks={onGoToNotebooks} />
               : <>
+                  {/* Model pre-selection filter — shared with Linguistic Explanations tab */}
+                  <ModelFilterBar
+                    showAllModels={showAllModels}
+                    onToggle={() => setShowAllModels(v => !v)}
+                    visibleCount={visibleSorted.length}
+                    totalCount={sorted.length}
+                    visibleNames={[skillBaseline?.model, bestModel?.model].filter(Boolean)}
+                  />
+
                   {/* Sort pills */}
                   <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginBottom: 14, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: 12, color: '#888780' }}>sort by:</span>
@@ -390,7 +435,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                   {activeMetricInfo && <MetricInfo metricKey={activeMetricInfo} onClose={() => setActiveMetricInfo(null)} />}
 
                   {/* Bar chart */}
-                  <ModelBarChart data={sorted} metric={sortBy} />
+                  <ModelBarChart data={visibleSorted} metric={sortBy} />
 
                   {/* Table */}
                   <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, overflow: 'hidden', marginBottom: 20 }}>
@@ -419,7 +464,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                           </tr>
                         </thead>
                         <tbody>
-                          {sorted.map((row, idx) => {
+                          {visibleSorted.map((row, idx) => {
                             const isSel = selectedModel === row.model;
                             const isBaseline = row.model === 'Seasonal Naive';
                             const skillMAE  = skillBaseline && !isBaseline ? (1 - row.MAE  / skillBaseline.MAE)  * 100 : null;
@@ -556,7 +601,17 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                   <p style={{ fontSize: 13, color: '#73726c', marginBottom: 4 }}>
                     Each model's forecast quality translated into structured linguistic statements using Computing with Words (notebook 04–05).
                   </p>
-                  {sorted.map(row => {
+
+                  {/* Model pre-selection filter — shared with Metrics tab */}
+                  <ModelFilterBar
+                    showAllModels={showAllModels}
+                    onToggle={() => setShowAllModels(v => !v)}
+                    visibleCount={visibleSorted.length}
+                    totalCount={sorted.length}
+                    visibleNames={[skillBaseline?.model, bestModel?.model].filter(Boolean)}
+                  />
+
+                  {visibleSorted.map(row => {
                     const bias = row.biasInfo;
                     const narRow = narratives?.find(r => (r.model || r.Model) === row.model);
                     const structuredExp = narRow?.Structured_Explanation || narRow?.structured_explanation;
