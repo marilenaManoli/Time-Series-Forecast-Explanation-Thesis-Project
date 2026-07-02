@@ -555,6 +555,9 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                                   </div>
                                 ))}
                               </div>
+                              <p style={{ margin: '8px 0 0', fontSize: 11, fontStyle: 'italic', color: '#6B7280' }}>
+                                These profiles describe general model class behaviour, not performance guarantees on your specific data or use case.
+                              </p>
                             </div>
                           );
                         })()}
