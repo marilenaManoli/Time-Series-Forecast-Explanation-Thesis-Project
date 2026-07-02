@@ -285,6 +285,29 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
   // Skill score baseline — Seasonal Naive; null if not present in data
   const skillBaseline = useMemo(() => enriched.find(m => m.model === 'Seasonal Naive') ?? null, [enriched]);
 
+  // Top summary banner — best model by MAE via rankScore(), independent of the table's
+  // current sortBy selection so the banner doesn't shift when the user re-sorts the table.
+  const bestModel = useMemo(() => {
+    if (!enriched.length) return null;
+    return [...enriched].sort((a, b) => rankScore('MAE', a.MAE) - rankScore('MAE', b.MAE))[0];
+  }, [enriched]);
+
+  const bestSkillMAE = useMemo(() => {
+    if (!bestModel || !skillBaseline || bestModel.model === skillBaseline.model) return null;
+    return (1 - bestModel.MAE / skillBaseline.MAE) * 100;
+  }, [bestModel, skillBaseline]);
+
+  // First sentence of the best model's existing CwW structured explanation (same source
+  // the Linguistic Explanations tab reads), falling back to the same first-line synthesis
+  // that tab already uses when no narrative row is found.
+  const bestExplanation = useMemo(() => {
+    if (!bestModel) return null;
+    const narRow = narratives?.find(r => (r.model || r.Model) === bestModel.model);
+    const structuredExp = narRow?.Structured_Explanation || narRow?.structured_explanation;
+    const full = structuredExp || `Accuracy is ${bestModel.mapeLabel} (MAPE = ${bestModel.MAPE}%).`;
+    return full.split(/(?<=[.!?])\s/)[0];
+  }, [bestModel, narratives]);
+
   const selected     = selectedModel ? sorted.find(d => d.model === selectedModel) : null;
   const selForecasts = useMemo(() => forecasts?.filter(f => f.model === selectedModel).slice(0, 30) || [], [forecasts, selectedModel]);
 
@@ -313,6 +336,26 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
               </button>
             )}
           </p>
+        </div>
+
+        {/* Top summary banner — entry point above the tabs, not part of any tab panel */}
+        <div style={{ background: '#F0F9FF', border: '1px solid #BAE6FD', borderRadius: 10, padding: '0.75rem 1.1rem', marginBottom: 18 }}>
+          {!hasMetrics || !bestModel
+            ? <p style={{ fontSize: 13, color: '#6B7280', margin: 0 }}>{loading ? 'Loading summary…' : 'No pipeline data found'}</p>
+            : <>
+                <p style={{ fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.07em', color: '#0369A1', fontWeight: 600, margin: '0 0 4px' }}>Best model</p>
+                <p style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 15, fontWeight: 600, color: '#1a1a18', margin: '0 0 3px' }}>
+                  <span style={{ width: 9, height: 9, borderRadius: '50%', background: bestModel.color }} />
+                  {bestModel.model}
+                </p>
+                {bestSkillMAE !== null && (
+                  <p style={{ fontSize: 12, fontWeight: 500, color: bestSkillMAE >= 0 ? '#3B6D11' : '#993C1D', margin: '0 0 4px' }}>
+                    {bestSkillMAE >= 0 ? '+' : ''}{bestSkillMAE.toFixed(0)}% vs. baseline (Seasonal Naive)
+                  </p>
+                )}
+                {bestExplanation && <p style={{ fontSize: 13, color: '#3d3d3a', margin: 0, lineHeight: 1.5 }}>{bestExplanation}</p>}
+              </>
+          }
         </div>
 
         {/* Tabs */}
