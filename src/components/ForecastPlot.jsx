@@ -68,6 +68,16 @@ export default function ForecastPlot({ forecastData, modelName, accentColor }) {
       <p style={{ fontSize: 11, fontStyle: 'italic', color: '#6B7280', margin: '4px 0 0' }}>
         Forecast vs. actual demand — 30-day evaluation window (Jul–Aug 2018)
       </p>
+      {modelName === 'Linear Regression' && (() => {
+        const predicted = rows.map(r => r.predicted);
+        const lo = Math.min(...predicted).toFixed(0);
+        const hi = Math.max(...predicted).toFixed(0);
+        return (
+          <p style={{ fontSize: 11, color: '#6B7280', margin: '2px 0 0' }}>
+            Note: the forecast line looks flat at this scale, but it isn't constant — predicted range: {lo}–{hi} MW.
+          </p>
+        );
+      })()}
     </div>
   );
 }
