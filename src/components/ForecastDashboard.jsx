@@ -80,7 +80,7 @@ const MODEL_PROFILES = {
   },
   'Linear Regression': {
     strengths: 'Transparent and auditable — individual coefficient contributions are directly inspectable.',
-    limitations: 'Assumes a linear relationship; cannot capture non-linearities or complex seasonality without feature engineering.',
+    limitations: 'Assumes a linear relationship; cannot capture non-linearities or complex seasonality without feature engineering. As a linear model, it assumes a linear relationship in the data — structurally unsuited for highly periodic or non-linear demand patterns common in energy time series.',
     use: 'Best suited for trend-dominated series with stable structure; use caution when demand is non-linear or seasonal.',
   },
   'ETS': {
@@ -511,7 +511,12 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                             const isBaseline = row.model === 'Seasonal Naive';
                             const skillMAE  = skillBaseline && !isBaseline ? (1 - row.MAE  / skillBaseline.MAE)  * 100 : null;
                             const skillRMSE = skillBaseline && !isBaseline ? (1 - row.RMSE / skillBaseline.RMSE) * 100 : null;
-                            const fmtSkill  = v => `${v >= 0 ? '+' : ''}${v.toFixed(0)}% vs. SNaive`;
+                            const fmtSkill  = v => (
+                              <>
+                                {v >= 0 ? '+' : ''}{v.toFixed(0)}% vs.{' '}
+                                <span title="Seasonal Naive: the simplest benchmark model — predicts tomorrow using the same value as the same day last week.">SNaive</span>
+                              </>
+                            );
                             return (
                               <tr key={row.model}
                                 onClick={() => setSelectedModel(isSel ? null : row.model)}
@@ -980,6 +985,9 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                                   ))}
                                 </div>
                               : <div>
+                                  <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginBottom: 4 }}>
+                                    Rule-based — generated from CWW fuzzy labels and data → AI-rephrased — LLM rewrite of the rule-based explanation
+                                  </p>
                                   <p style={{ fontSize: 11, color: '#888780', marginBottom: 8 }}>
                                     Changes from template to LLM version:{' '}
                                     <span style={{ background: '#FEF08A', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.25)', borderRadius: 2, padding: '0 3px' }}>yellow = changed/added</span>
