@@ -41,13 +41,15 @@ Membership functions (triangular) are calibrated to the AEP daily demand range:
 
 ## Dashboard
 
-The React dashboard (`src/`) presents five views for each model:
+The React dashboard (`src/`) opens on a **top summary banner** (best-ranked model, its skill score vs. baseline, and a one-line explanation) shown above the tabs regardless of which tab is active, and presents five tab views:
 
-1. **Metrics & quality** — sortable comparison table + bar chart; MAE and RMSE cells include a skill score vs. Seasonal Naive baseline (e.g. "+19% vs. SNaive"), computed as `(1 − model_error / baseline_error) × 100`
-2. **Linguistic explanations** — CwW-derived fuzzy labels and structured explanation sentences, followed by a hand-authored **Model profile** block (Strengths / Limitations / Recommended use) per model class
+1. **Metrics & quality** — a free-text box ("what matters most for your decision?") that classifies your answer into one of four fixed preferences (overall accuracy / avoid big misses / directional trend / consistent behaviour) via a local LLM, then deterministically re-sorts the table by the matching metric — always confirmed before applying, with a manual dropdown available as a direct alternative; a model pre-selection filter (defaults to baseline + best model, expandable to all 7); sortable comparison table + bar chart; MAE and RMSE cells include a skill score vs. Seasonal Naive baseline (e.g. "+19% vs. SNaive", with a hover tooltip defining the baseline), computed as `(1 − model_error / baseline_error) × 100`
+2. **Linguistic explanations** — CwW-derived fuzzy labels and structured explanation sentences, a per-model forecast-vs-actual chart (shared Y-axis across all 7 models for comparability), followed by a hand-authored **Model profile** block (Strengths / Limitations / Recommended use — each including a one-sentence structural-assumption disclosure) per model class, with a disclaimer that profiles describe general model-class behaviour, not a guarantee on this specific data
 3. **Narratives** — human-readable narrative summaries (notebook 06)
-4. **Threshold sensitivity** — confidence heatmap and stability chart from notebook 08; includes a comparability warning, per-model colour borders, and a moderator **Test mode** (10 s timed reveal with blur + reset) for evaluation sessions
-5. **LLM Narrative** — template narrative (notebook 06) and LLM-rephrased narrative (notebook 09) side by side, with a faithfulness flag if the LLM introduced an unverified number; Blind mode for Task 4 evaluation
+4. **Threshold sensitivity** — confidence heatmap and stability chart from notebook 08; includes a comparability caption (scores are only meaningful within a model's own row, not across models), a legend note that colour indicates within-model stability rather than cross-model rank, per-model colour borders, and a moderator **Test mode** (10 s timed reveal with blur + reset) for evaluation sessions
+5. **LLM Narrative** — template narrative (notebook 06) and LLM-rephrased narrative (notebook 09), viewed as a three-stage flow: blind comparison (Version A/B, identities hidden) → Reveal (real identities, full text, no diff yet) → opt-in **Show differences** (word-level diff highlighting what the LLM changed), with a faithfulness flag if the LLM introduced an unverified number and a caveat that fluent phrasing isn't itself evidence of accuracy
+
+The Metrics tab's free-text classifier calls a **local LLM at runtime** (see Setup below) — everything else in the dashboard reads only pre-generated static files and needs no LLM running to use.
 
 ## Structure
 
@@ -91,6 +93,8 @@ npm run dev
 ```
 
 Open `http://localhost:5173`.
+
+**The Metrics & Quality tab's free-text preference classifier also calls Ollama directly from the browser** (same local `llama3` model as notebook 09, no separate setup) — keep `ollama serve` running while using the dashboard if you want that specific feature to work. Every other tab and feature reads only pre-generated static files and works with Ollama stopped; the classifier just falls back to showing a "couldn't reach the local classifier" message and the manual dropdown still works normally.
 
 ## Author
 
