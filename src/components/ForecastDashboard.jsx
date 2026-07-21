@@ -198,7 +198,7 @@ function ModelBarChart({ data, metric }) {
   return (
     <div style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem', marginBottom: 16 }}>
       <p style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#888780', fontWeight: 600, marginBottom: 12 }}>
-        {metric} — visual comparison ({higherIsBetter ? 'longer bar = better' : 'longer bar = better'})
+        {metric} — visual comparison (longer bar = better)
       </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 7 }}>
         {data.map(d => (
@@ -400,7 +400,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
   }, [sorted, showAllModels, defaultVisibleModelNames]);
 
   const selected     = selectedModel ? visibleSorted.find(d => d.model === selectedModel) : null;
-  const selForecasts = useMemo(() => forecasts?.filter(f => f.model === selectedModel).slice(0, 30) || [], [forecasts, selectedModel]);
+  const selForecasts = useMemo(() => forecasts?.filter(f => f.model === selectedModel).slice(-30) || [], [forecasts, selectedModel]);
 
   const TABS = [
     { id: 'metrics',      label: 'Metrics & quality' },

@@ -68,7 +68,7 @@ export default function StepWindow({ step }) {
         </a>
         {step.htmlFallback && (
           <a
-            href={`/public/${step.htmlFallback}`}
+            href={`/${step.htmlFallback}`}
             className="btn btn--secondary"
             target="_blank"
             rel="noopener noreferrer"
