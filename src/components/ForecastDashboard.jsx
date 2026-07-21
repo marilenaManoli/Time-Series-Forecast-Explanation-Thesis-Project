@@ -1,5 +1,17 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import ForecastPlot from './ForecastPlot';
+import MetricsPreferenceControl from './MetricsPreferenceControl';
+
+// Deterministic label → metric mapping for the free-text/manual preference control.
+// No LLM involvement past this point — applying a label just sets `sortBy` to the
+// corresponding existing metric column, exactly as if the user had clicked that
+// column's existing sort pill. Nothing here computes a new metric or adds a column.
+const PREFERENCE_TO_METRIC = {
+  overall_accuracy:    'MAE',  // this tab's default/primary metric — only one with its own skill-score sub-line
+  avoid_big_misses:    'RMSE',
+  directional_trend:   'DA',
+  consistent_behavior: 'MPE',  // existing bias metric; rankScore() already ranks closest-to-zero (least biased) first
+};
 
 // ── Computing with Words — fuzzy linguistic labels ─────────────────────────
 function cww(value, thresholds, labels) {
@@ -457,6 +469,15 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
             {!hasMetrics
               ? <EmptyState loading={loading} onGoToNotebooks={onGoToNotebooks} />
               : <>
+                  {/* Free-text / manual preference control — classifies into a fixed label,
+                      then deterministically maps that label to an existing sort column. */}
+                  <MetricsPreferenceControl
+                    onApply={label => {
+                      const metric = PREFERENCE_TO_METRIC[label];
+                      if (metric) { setSortBy(metric); setActiveMetricInfo(metric); }
+                    }}
+                  />
+
                   {/* Model pre-selection filter — shared with Linguistic Explanations tab */}
                   <ModelFilterBar
                     showAllModels={showAllModels}
@@ -515,7 +536,10 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                             const fmtSkill  = v => (
                               <>
                                 {v >= 0 ? '+' : ''}{v.toFixed(0)}% vs.{' '}
-                                <span title="Seasonal Naive: the simplest benchmark model — predicts tomorrow using the same value as the same day last week.">SNaive</span>
+                                <span className="hint" tabIndex={0}>
+                                  SNaive
+                                  <span className="hint__bubble">Seasonal Naive: the simplest benchmark model — predicts tomorrow using the same value as the same day last week.</span>
+                                </span>
                               </>
                             );
                             return (

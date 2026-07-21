@@ -368,3 +368,38 @@ body {
   padding: 0; margin: -1px; overflow: hidden;
   clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
+
+/* CSS-only hover tooltip — doesn't rely on the native `title` attribute,
+   which some browsers delay or suppress. */
+.hint {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+.hint__bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translate(-50%, -6px);
+  background: #1a1a18;
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  padding: 6px 9px;
+  border-radius: 6px;
+  width: max-content;
+  max-width: 240px;
+  text-align: left;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.12s ease;
+  z-index: 50;
+}
+.hint:hover .hint__bubble,
+.hint:focus-visible .hint__bubble {
+  opacity: 1;
+  visibility: visible;
+}
