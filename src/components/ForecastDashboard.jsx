@@ -70,37 +70,37 @@ const EXPLANATIONS = {
 const MODEL_PROFILES = {
   'Naive': {
     strengths: 'Zero-cost statistical lower bound; always available without training.',
-    limitations: 'Ignores all patterns — trend, seasonality, autocorrelation. Valid only as a sanity-check floor.',
+    limitations: 'Ignores all patterns — trend, seasonality, autocorrelation. Valid only as a sanity-check floor. Assumes tomorrow equals today — no adjustment for trend or seasonality at all.',
     use: 'Use as a minimum-bar comparison only; not suitable for operational decisions.',
   },
   'Seasonal Naive': {
     strengths: 'Captures weekly/daily seasonality with no trainable parameters. Fully interpretable and fast.',
-    limitations: 'Cannot model trend or irregular demand; degrades when seasonal patterns shift.',
+    limitations: 'Cannot model trend or irregular demand; degrades when seasonal patterns shift. Assumes the next value repeats the same point from the prior seasonal cycle — will not adapt to trend changes or fast-moving conditions.',
     use: 'Strong baseline for stable, highly seasonal demand. This dataset\'s reference model for skill-score comparison.',
   },
   'Linear Regression': {
     strengths: 'Transparent and auditable — individual coefficient contributions are directly inspectable.',
-    limitations: 'Assumes a linear relationship; cannot capture non-linearities or complex seasonality without feature engineering. As a linear model, it assumes a linear relationship in the data — structurally unsuited for highly periodic or non-linear demand patterns common in energy time series.',
+    limitations: 'Assumes a linear relationship in the data — structurally unsuited to highly periodic or non-linear patterns common in time-series/energy data; cannot capture complex seasonality without feature engineering.',
     use: 'Best suited for trend-dominated series with stable structure; use caution when demand is non-linear or seasonal.',
   },
   'ETS': {
     strengths: 'Handles trend and seasonality via exponential smoothing; adapts gradually to level changes.',
-    limitations: 'Additive/multiplicative structure is selected at fit time and cannot change mid-series.',
+    limitations: 'Additive/multiplicative structure is selected at fit time and cannot change mid-series. Assumes a smoothly evolving level, trend, and seasonal component — sensitive to sudden structural breaks.',
     use: 'Suitable for medium-term scheduling on stable to moderately volatile demand patterns.',
   },
   'HWES (damped)': {
     strengths: 'Damped-trend variant of Holt-Winters — avoids over-extrapolating trends, reducing long-horizon error.',
-    limitations: 'Still exponential-smoothing family; limited capacity for complex multi-seasonal patterns.',
+    limitations: 'Still exponential-smoothing family; limited capacity for complex multi-seasonal patterns. Assumes a smoothly evolving level, trend, and seasonal component — sensitive to sudden structural breaks.',
     use: 'Preferred when a trend is present but expected to flatten; good for 1–4 week planning horizons.',
   },
   'SARIMA': {
     strengths: 'Principled statistical model capturing autoregressive, moving-average, and seasonal structure simultaneously.',
-    limitations: 'Parameter selection (p,d,q,P,D,Q) requires domain expertise or automated search; heavier to fit.',
+    limitations: 'Parameter selection (p,d,q,P,D,Q) requires domain expertise or automated search; heavier to fit. Assumes a (differenced-to-)stationary linear process with seasonal structure — may underperform under abrupt regime shifts.',
     use: 'Suitable for stationary or differenced series with clear autocorrelation; use caution during demand regime changes.',
   },
   'Prophet': {
     strengths: 'Handles multiple seasonalities, trend changepoints, and holiday effects out of the box; robust to missing data.',
-    limitations: 'Changepoints may be over- or under-fit; less reliable on short or highly irregular series.',
+    limitations: 'Changepoints may be over- or under-fit; less reliable on short or highly irregular series. As an additive decomposition model, it can struggle on short series or non-additive interactions between components.',
     use: 'Best for longer series with holiday/event effects; more appropriate for capacity planning than operational dispatch.',
   },
 };
@@ -800,7 +800,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 10, background: '#FEF3C7', border: '1px solid #F59E0B', borderRadius: 8, padding: '10px 14px', marginBottom: 14 }}>
                     <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>⚠</span>
                     <p style={{ fontSize: 13, color: '#78350F', lineHeight: 1.55, margin: 0, fontWeight: 500 }}>
-                      <strong>Scores are not comparable across models.</strong> Each confidence score reflects only how firmly <em>that model's own label</em> was assigned — a higher score does not mean the model is more accurate or trustworthy than another. Compare scores within a single row only.
+                      <strong>Confidence scores reflect how stable this model's own label is across threshold levels.</strong> They are not comparable across models — a 0.85 here and a 0.85 for another model are not the same thing. Compare scores within a single row only.
                     </p>
                   </div>
                   {/* Time's-up overlay */}
@@ -861,6 +861,9 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                       <span key={l} style={{ background: bg, color: text, borderRadius: 5, padding: '2px 9px', fontSize: 11 }}>{l}</span>
                     ))}
                   </div>
+                  <p style={{ fontSize: 11, color: '#888780', marginTop: 6 }}>
+                    Color indicates stability within a model, not rank versus other models.
+                  </p>
                 </div>
               )}
 
@@ -995,6 +998,9 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                                     <span style={{ textDecoration: 'line-through', color: '#FCA5A5' }}>strikethrough = removed</span>
                                   </p>
                                   <NarrativeDiff templateText={llmRow.template_narrative} llmText={llmRow.llm_narrative} />
+                                  <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginTop: 8 }}>
+                                    Fluent or confident-sounding phrasing is not itself evidence of statistical accuracy — verify against the metrics above.
+                                  </p>
                                 </div>
                             )
                           : <p style={{ fontSize: 13, color: '#888780', fontStyle: 'italic' }}>
