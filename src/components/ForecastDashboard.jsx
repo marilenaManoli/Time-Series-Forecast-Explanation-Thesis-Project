@@ -283,6 +283,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
   const [blindMode, setBlindMode]           = useState(false); // LLM Narrative tab: evaluation Task 4 blind compare
   const [blindRevealed, setBlindRevealed]   = useState(false);
   const [blindSeed, setBlindSeed]           = useState(0); // bump to reshuffle for the next participant
+  const [showDiff, setShowDiff]             = useState(false); // LLM Narrative tab: opt-in diff view, only after identities are revealed
 
   // ── Timed-reveal test mode (sensitivity table) ──────────────────────────────
   const [testPhase, setTestPhase]       = useState('idle'); // idle | running | done
@@ -926,7 +927,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                       <input
                         type="checkbox"
                         checked={blindMode}
-                        onChange={e => { setBlindMode(e.target.checked); setBlindRevealed(false); }}
+                        onChange={e => { setBlindMode(e.target.checked); setBlindRevealed(false); setShowDiff(false); }}
                       />
                       Blind mode (hide which version is which)
                     </label>
@@ -940,13 +941,21 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                           Reveal
                         </button>
                         <button
-                          onClick={() => { setBlindSeed(s => s + 1); setBlindRevealed(false); }}
+                          onClick={() => { setBlindSeed(s => s + 1); setBlindRevealed(false); setShowDiff(false); }}
                           style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '0.5px solid rgba(0,0,0,0.15)', background: '#ffffff', color: '#3d3d3a', cursor: 'pointer', fontFamily: 'inherit' }}
                         >
                           Reshuffle for next participant
                         </button>
                         <span style={{ fontSize: 11, color: '#888780' }}>{blindRevealed ? 'Revealed' : 'Hidden — Version A/B order is randomized per model'}</span>
                       </>
+                    )}
+                    {(!blindMode || blindRevealed) && llmNarratives && (
+                      <button
+                        onClick={() => setShowDiff(v => !v)}
+                        style={{ fontSize: 12, padding: '4px 10px', borderRadius: 6, border: '0.5px solid rgba(0,0,0,0.15)', background: showDiff ? '#1a1a18' : '#ffffff', color: showDiff ? '#ffffff' : '#3d3d3a', cursor: 'pointer', fontFamily: 'inherit', marginLeft: blindMode ? 0 : 'auto' }}
+                      >
+                        {showDiff ? '← Hide differences' : 'Show differences'}
+                      </button>
                     )}
                   </div>
 
@@ -958,8 +967,8 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                     // the label is just "Version A"/"Version B", swapped per model so a
                     // participant can't learn "A is always the rule-based one."
                     const sides = llmRow ? (swapped
-                      ? [{ key: 'llm', label: 'LLM-rephrased', text: llmRow.llm_narrative }, { key: 'template', label: 'Rule-based (template)', text: llmRow.template_narrative }]
-                      : [{ key: 'template', label: 'Rule-based (template)', text: llmRow.template_narrative }, { key: 'llm', label: 'LLM-rephrased', text: llmRow.llm_narrative }]
+                      ? [{ key: 'llm', label: 'AI-rephrased — LLM rewrite of the rule-based explanation.', text: llmRow.llm_narrative }, { key: 'template', label: 'Rule-based — generated directly from the Computing-with-Words fuzzy labels and underlying data.', text: llmRow.template_narrative }]
+                      : [{ key: 'template', label: 'Rule-based — generated directly from the Computing-with-Words fuzzy labels and underlying data.', text: llmRow.template_narrative }, { key: 'llm', label: 'AI-rephrased — LLM rewrite of the rule-based explanation.', text: llmRow.llm_narrative }]
                     ) : [];
                     return (
                       <div key={row.model} style={{ background: '#ffffff', border: '0.5px solid rgba(0,0,0,0.1)', borderRadius: 10, padding: '1rem 1.25rem' }}>
@@ -987,21 +996,32 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                                     </div>
                                   ))}
                                 </div>
-                              : <div>
-                                  <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginBottom: 4 }}>
-                                    Rule-based — generated from CWW fuzzy labels and data → AI-rephrased — LLM rewrite of the rule-based explanation
-                                  </p>
-                                  <p style={{ fontSize: 11, color: '#888780', marginBottom: 8 }}>
-                                    Changes from template to LLM version:{' '}
-                                    <span style={{ background: '#FEF08A', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.25)', borderRadius: 2, padding: '0 3px' }}>yellow = changed/added</span>
-                                    {' '}
-                                    <span style={{ textDecoration: 'line-through', color: '#FCA5A5' }}>strikethrough = removed</span>
-                                  </p>
-                                  <NarrativeDiff templateText={llmRow.template_narrative} llmText={llmRow.llm_narrative} />
-                                  <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginTop: 8 }}>
-                                    Fluent or confident-sounding phrasing is not itself evidence of statistical accuracy — verify against the metrics above.
-                                  </p>
-                                </div>
+                              : !showDiff
+                                  ? <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                                      {sides.map((side, i) => (
+                                        <div key={side.key}>
+                                          <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginBottom: 4 }}>
+                                            {side.label}
+                                          </p>
+                                          <p style={{ fontSize: 13, color: '#3d3d3a', lineHeight: 1.6 }}>{side.text}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  : <div>
+                                      <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginBottom: 4 }}>
+                                        Rule-based — generated from CWW fuzzy labels and data → AI-rephrased — LLM rewrite of the rule-based explanation
+                                      </p>
+                                      <p style={{ fontSize: 11, color: '#888780', marginBottom: 8 }}>
+                                        Changes from template to LLM version:{' '}
+                                        <span style={{ background: '#FEF08A', textDecoration: 'underline', textDecorationColor: 'rgba(0,0,0,0.25)', borderRadius: 2, padding: '0 3px' }}>yellow = changed/added</span>
+                                        {' '}
+                                        <span style={{ textDecoration: 'line-through', color: '#FCA5A5' }}>strikethrough = removed</span>
+                                      </p>
+                                      <NarrativeDiff templateText={llmRow.template_narrative} llmText={llmRow.llm_narrative} />
+                                      <p style={{ fontSize: 11, color: '#6B7280', fontStyle: 'italic', marginTop: 8 }}>
+                                        Fluent or confident-sounding phrasing is not itself evidence of statistical accuracy — verify against the metrics above.
+                                      </p>
+                                    </div>
                             )
                           : <p style={{ fontSize: 13, color: '#888780', fontStyle: 'italic' }}>
                               No LLM narrative found for this model. Run notebook 09 to generate it, then re-load the app.
