@@ -96,6 +96,11 @@ Open `http://localhost:5173`.
 
 **The Metrics & Quality tab's free-text preference classifier also calls Ollama directly from the browser** (same local `llama3` model as notebook 09, no separate setup) — keep `ollama serve` running while using the dashboard if you want that specific feature to work. Every other tab and feature reads only pre-generated static files and works with Ollama stopped; the classifier just falls back to showing a "couldn't reach the local classifier" message and the manual dropdown still works normally.
 
+## Documentation
+
+- [`docs/PROJECT_REPORT.md`](docs/PROJECT_REPORT.md) — full technical narrative: every notebook explained, current results, known issues, and a dated changelog of dashboard additions
+- [`docs/EVALUATION_PLAN.md`](docs/EVALUATION_PLAN.md) — the expert evaluation study protocol (session script, tasks, questionnaire)
+
 ## Author
 
 Marilena Manoli  

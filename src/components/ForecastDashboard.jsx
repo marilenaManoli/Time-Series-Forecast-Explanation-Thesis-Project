@@ -945,7 +945,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                     {!llmNarratives && <span style={{ color: '#854f0b' }}> Run notebook 09 to populate this tab.</span>}
                   </p>
 
-                  {/* Blind-mode controls, for evaluation Task 4 (EVALUATION_PLAN.md §4) */}
+                  {/* Blind-mode controls, for evaluation Task 4 (docs/EVALUATION_PLAN.md §4) */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#f9f8f4', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: 10, padding: '0.6rem 0.9rem', marginBottom: 4 }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: '#3d3d3a', cursor: 'pointer' }}>
                       <input
