@@ -743,11 +743,11 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
         {tab === 'sensitivity' && (() => {
           const conf = sensitivity?.confidence;
           const stability = sensitivity?.stability;
-          const METRICS = ['mae', 'mpe', 'mape', 'da'];
-          const LABELS  = ['MAE', 'MPE', 'MAPE', 'DA'];
+          const METRICS = ['mae', 'rmse', 'mpe', 'mape', 'da'];
+          const LABELS  = ['MAE', 'RMSE', 'MPE', 'MAPE', 'DA'];
 
           // % of deltas where n_changed === 0, per metric
-          const stableRates = ['MAE', 'MAPE', 'DA'].map(m => {
+          const stableRates = ['MAE', 'RMSE', 'MAPE', 'DA'].map(m => {
             const rows = stability?.filter(r => r.metric === m) || [];
             const stable = rows.filter(r => r.n_changed === 0).length;
             return { metric: m, pct: rows.length ? Math.round((stable / rows.length) * 100) : null };
@@ -790,7 +790,7 @@ export default function ForecastDashboard({ metrics, forecasts, narratives, fuzz
                     ))}
                   </div>
                   <p style={{ fontSize: 11, color: '#888780', marginTop: 10 }}>
-                    MAE thresholds are the most sensitive because several models cluster in the medium-error range. DA thresholds are the most stable.
+                    RMSE and MAE thresholds are the most sensitive because several models cluster in the medium-error range. DA thresholds are the most stable.
                   </p>
                 </div>
               )}
