@@ -22,11 +22,15 @@ function cww(value, thresholds, labels) {
 }
 const mapeLabel = v => cww(v, [5, 8, 10, 13], ['excellent', 'good', 'acceptable', 'poor', 'very poor']);
 const daLabel   = v => cww(v, [55, 65, 75, 85], ['random', 'low', 'moderate', 'high', 'very high']);
+// MPE convention (matches notebook 03's compute_metrics): mean((actual - predicted) / actual) * 100.
+// Positive MPE means the model's forecast was too low relative to what happened (under-forecast);
+// negative means it was too high (over-forecast). Fixed 2026-08-08 — this fallback previously had
+// the two branches swapped, same bug as the fuzzy MPE membership functions in notebooks 04/08.
 function biasLabel(mpe) {
   if (Math.abs(mpe) < 1) return { text: 'unbiased', dir: 'neutral' };
   return mpe > 0
-    ? { text: mpe > 5 ? 'strongly over-forecasts' : 'slightly over-forecasts', dir: 'over' }
-    : { text: Math.abs(mpe) > 5 ? 'strongly under-forecasts' : 'slightly under-forecasts', dir: 'under' };
+    ? { text: mpe > 5 ? 'strongly under-forecasts' : 'slightly under-forecasts', dir: 'under' }
+    : { text: Math.abs(mpe) > 5 ? 'strongly over-forecasts' : 'slightly over-forecasts', dir: 'over' };
 }
 
 // Maps notebook 04's real CwW label vocabulary (session04_fuzzy_labels.csv) onto
