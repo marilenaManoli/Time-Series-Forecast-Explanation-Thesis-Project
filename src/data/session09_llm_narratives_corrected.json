@@ -1,0 +1,79 @@
+[
+  {
+    "model": "Naive",
+    "mae_label": "high error",
+    "mpe_label": "slight underprediction",
+    "mape_label": "high mape",
+    "da_label": "low DA",
+    "template_narrative": "Naive is among the weaker models in this evaluation. The model has high absolute error with a slight tendency to underpredict demand. Its percentage error is high, limiting usefulness for demand-sensitive decisions. It struggles to correctly identify whether demand will rise or fall. This makes it less suited for scheduling decisions that depend on knowing whether demand will rise or fall.",
+    "llm_narrative": "Naive is a model that falls short in this evaluation. It consistently produces high absolute errors and has a slight tendency to underestimate demand. This underprediction leads to a high percentage error, making it less reliable for decisions that rely on accurate demand forecasts. Additionally, Naive struggles to accurately predict whether demand will increase or decrease, which further limits its usefulness for scheduling decisions that require this type of insight.",
+    "faithfulness_flag": false,
+    "flagged_numbers": []
+  },
+  {
+    "model": "Seasonal Naive",
+    "mae_label": "medium error",
+    "mpe_label": "neutral",
+    "mape_label": "medium mape",
+    "da_label": "medium DA",
+    "template_narrative": "Seasonal Naive shows moderate forecasting accuracy. The model shows moderate absolute error with no consistent directional bias. Its percentage error is moderate, acceptable for operational planning. It correctly identifies the direction of demand change roughly two-thirds of the time. This level of directional accuracy is generally useful for operational scheduling.",
+    "llm_narrative": "Seasonal Naive demonstrates a moderate level of forecasting accuracy. Its predictions are characterized by a medium-sized error, with no noticeable tendency to over- or under-predict demand. Additionally, the model's percentage error is also moderate, making it suitable for operational planning purposes. Furthermore, Seasonal Naive correctly identifies the direction of demand changes roughly two-thirds of the time, which is generally useful for scheduling and planning operations.",
+    "faithfulness_flag": false,
+    "flagged_numbers": []
+  },
+  {
+    "model": "Linear Regression",
+    "mae_label": "low error",
+    "mpe_label": "slight underprediction",
+    "mape_label": "medium mape",
+    "da_label": "low DA",
+    "template_narrative": "Linear Regression performs well in terms of absolute error. The model achieves low absolute error with a slight tendency to underpredict demand. Its percentage error is moderate, acceptable for operational planning. It struggles to correctly identify whether demand will rise or fall. This makes it less suited for scheduling decisions that depend on knowing whether demand will rise or fall.",
+    "llm_narrative": "Linear Regression does a good job of predicting demand overall, with a low level of error. While it tends to slightly underestimate demand, this underprediction is relatively minor. The model's percentage error is moderate, making it suitable for operational planning purposes. However, Linear Regression struggles to accurately determine whether demand will increase or decrease, which can be a limitation when making scheduling decisions that rely on knowing the direction of demand changes.",
+    "faithfulness_flag": false,
+    "flagged_numbers": []
+  },
+  {
+    "model": "ETS",
+    "mae_label": "medium error",
+    "mpe_label": "slight underprediction",
+    "mape_label": "medium mape",
+    "da_label": "medium DA",
+    "template_narrative": "ETS shows moderate forecasting accuracy. The model shows moderate absolute error with a slight tendency to underpredict demand. Its percentage error is moderate, acceptable for operational planning. It correctly identifies the direction of demand change roughly two-thirds of the time. This level of directional accuracy is generally useful for operational scheduling.",
+    "llm_narrative": "ETS demonstrates moderate forecasting accuracy, with a medium-sized error that's neither too high nor too low. While it tends to slightly underpredict demand, this bias is relatively small and shouldn't cause significant issues. The model's percentage error is also moderate, making it suitable for operational planning purposes. Additionally, ETS correctly identifies the direction of demand change roughly two-thirds of the time, which is a useful level of directional accuracy for scheduling purposes.",
+    "faithfulness_flag": false,
+    "flagged_numbers": []
+  },
+  {
+    "model": "HWES (damped)",
+    "mae_label": "medium error",
+    "mpe_label": "slight underprediction",
+    "mape_label": "medium mape",
+    "da_label": "medium DA",
+    "template_narrative": "HWES (damped) shows moderate forecasting accuracy. The model shows moderate absolute error with a slight tendency to underpredict demand. Its percentage error is moderate, acceptable for operational planning. It correctly identifies the direction of demand change roughly two-thirds of the time. This level of directional accuracy is generally useful for operational scheduling.",
+    "llm_narrative": "The HWES (damped) model demonstrates a moderate level of forecasting accuracy. While it tends to slightly underpredict demand, its absolute error remains at a medium magnitude. Additionally, the model's percentage error is also moderate, making it suitable for operational planning purposes. Furthermore, it correctly identifies the direction of demand change roughly two-thirds of the time, which is generally useful for scheduling purposes.",
+    "faithfulness_flag": false,
+    "flagged_numbers": []
+  },
+  {
+    "model": "SARIMA",
+    "mae_label": "medium error",
+    "mpe_label": "slight underprediction",
+    "mape_label": "medium mape",
+    "da_label": "medium DA",
+    "template_narrative": "SARIMA shows moderate forecasting accuracy. The model shows moderate absolute error with a slight tendency to underpredict demand. Its percentage error is moderate, acceptable for operational planning. It correctly identifies the direction of demand change roughly two-thirds of the time. This level of directional accuracy is generally useful for operational scheduling.",
+    "llm_narrative": "SARIMA demonstrates a moderate level of forecasting accuracy. While it tends to slightly underpredict demand, its absolute error remains moderate and acceptable for operational planning purposes. Additionally, SARIMA correctly identifies the direction of demand change roughly two-thirds of the time, making this directional accuracy generally useful for scheduling decisions.",
+    "faithfulness_flag": false,
+    "flagged_numbers": []
+  },
+  {
+    "model": "Prophet",
+    "mae_label": "low error",
+    "mpe_label": "slight underprediction",
+    "mape_label": "low mape",
+    "da_label": "medium DA",
+    "template_narrative": "Prophet is one of the stronger models in this comparison. The model achieves low absolute error with a slight tendency to underpredict demand. Its percentage error is low, making it reliable across different demand levels. It correctly identifies the direction of demand change roughly two-thirds of the time. This level of directional accuracy is generally useful for operational scheduling.",
+    "llm_narrative": "Prophet is a reliable model that consistently produces low absolute error with a slight tendency to underestimate demand. Its performance is also dependable across varying demand levels, as its percentage error remains low. Additionally, Prophet accurately identifies the direction of demand changes roughly two-thirds of the time, making it useful for operational scheduling purposes.",
+    "faithfulness_flag": false,
+    "flagged_numbers": []
+  }
+]
