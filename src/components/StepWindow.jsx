@@ -48,25 +48,8 @@ export default function StepWindow({ step }) {
         </div>
       )}
 
-      {step.presenter && (
-        <div className="step-content__section">
-          <p className="step-content__section-label">Presenter note</p>
-          <div className="presenter-note">
-            <p>{step.presenter}</p>
-          </div>
-        </div>
-      )}
-
-      <div className="step-content__actions">
-        <a
-          href={notebookHref}
-          className="btn btn--primary"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Open notebook ↗
-        </a>
-        {step.htmlFallback && (
+      {step.htmlFallback && (
+        <div className="step-content__actions">
           <a
             href={`/${step.htmlFallback}`}
             className="btn btn--secondary"
@@ -75,8 +58,8 @@ export default function StepWindow({ step }) {
           >
             Preview HTML export
           </a>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

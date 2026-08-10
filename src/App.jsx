@@ -50,7 +50,7 @@ export default function App() {
         tryFetch('/src/data/session06_narratives.csv'),
         tryFetch('/src/data/session04_fuzzy_labels.csv'),
         tryFetch('/src/data/session08_sensitivity.json'),
-        tryFetch('/src/data/session09_llm_narratives.json'),
+        tryFetch('/src/data/session09_llm_narratives_corrected.json'),
       ]);
 
       setMetrics(m);
