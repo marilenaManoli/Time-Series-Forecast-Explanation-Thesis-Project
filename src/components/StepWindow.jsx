@@ -48,18 +48,6 @@ export default function StepWindow({ step }) {
         </div>
       )}
 
-      {step.htmlFallback && (
-        <div className="step-content__actions">
-          <a
-            href={`/${step.htmlFallback}`}
-            className="btn btn--secondary"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Preview HTML export
-          </a>
-        </div>
-      )}
     </div>
   );
 }
