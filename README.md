@@ -36,7 +36,7 @@ Membership functions (triangular) are calibrated to the AEP daily demand range:
 
 - **MAE** [0–2500 MW]: low / medium / high error
 - **RMSE** [0–3000 MW]: low / medium / high error
-- **MPE** [−25–+25 %]: slight underprediction / neutral / slight overprediction
+- **MPE** [−25–+25 %]: slight overprediction / neutral / slight underprediction (MPE = mean((actual − predicted) / actual) × 100, so negative = over-forecast, positive = under-forecast)
 - **MAPE** [0–20 %]: low / medium / high MAPE
 - **DA** [0–100 %]: low / medium / high directional accuracy
 

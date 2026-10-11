@@ -24,7 +24,7 @@ Forecasting models produce numbers — "MAE = 1238", "MAPE = 7.9%". Most people,
   | MPE | *signed* percentage error — tells you if the model leans high or low | closer to 0 |
   | DA | Directional Accuracy — % of days it correctly predicted demand would rise or fall, regardless of size | higher |
 
-  **One convention to know:** in this codebase, `MPE = (actual − predicted) / actual`. A *positive* MPE means the model's prediction was lower than what actually happened — i.e. the model **under**-predicted. The code (and the labels it produces) call a positive MPE "over-forecast." That reads backwards at first glance, but it's applied consistently everywhere, so it's a naming choice, not a calculation bug — just don't assume "over-forecast" means what it sounds like.
+  **One convention to know:** in this codebase, `MPE = (actual − predicted) / actual`. A *positive* MPE means the model's prediction was lower than what actually happened — i.e. the model **under**-predicted — and a *negative* MPE means it **over**-predicted. Every label-producing step (notebook 03's bias check, the fuzzy membership functions in notebooks 04 and 08, and the dashboard's bias badge) follows this convention. Earlier versions had the two directions swapped in several of those places; see the fix notes in §6.
 
 ## 3. The two parts of the project, and how they connect
 
@@ -83,7 +83,7 @@ For each notebook: what it's for, what it reads, what it does in plain terms, an
 **Reads:** `metrics_all_models.json` from notebook 03.
 **Does:** defines three overlapping triangular "buckets" for each metric (e.g. for MAE: low/medium/high) and assigns each model to whichever bucket it overlaps with most. The exact triangle boundaries (in `[left edge, peak, right edge]` form) are:
 
-| Metric | low / under | medium / neutral | high / over |
+| Metric | low / over | medium / neutral | high / under |
 |---|---|---|---|
 | MAE (0–2500 MW) | `[0, 1100, 1300]` | `[1200, 1500, 1700]` | `[1600, 1800, 2500]` |
 | MPE (−25% to +25%) | `[-25, -6, -0.5]` | `[-1.0, 0, 1.0]` | `[0.5, 6, 25]` |
@@ -91,17 +91,17 @@ For each notebook: what it's for, what it reads, what it does in plain terms, an
 | DA (0–100%) | `[0, 0, 58]` | `[55, 68, 82]` | `[75, 90, 100]` |
 
 **Important to know:** these boundaries were chosen by hand to fit *these exact 7 models' results* (the code comments say this directly — e.g. "low = Prophet/LR, medium = stat models, high = Naive"). They are not a general industry-standard scale. That's a deliberate, reasonable design choice for a thesis — but it's the single most "judgment call"-heavy step in the whole pipeline, which is exactly why notebook 08 exists (see below).
-**Produces:** `src/data/session04_fuzzy_labels.csv` — for each model, a label for MAE, MPE, MAPE, and DA. E.g. Prophet → `low error, slight overprediction, low mape, medium DA`. Naive → `high error, slight overprediction, high mape, low DA`.
+**Produces:** `src/data/session04_fuzzy_labels.csv` — for each model, a label for MAE, MPE, MAPE, and DA. E.g. Prophet → `low error, slight underprediction, low mape, medium DA`. Naive → `high error, slight underprediction, high mape, low DA`.
 
 ### `05_structured_explanations.ipynb`
 **Goal:** turn those labels into one short, readable sentence per model. Deliberately simple — no AI text generation, just a lookup table of canned phrases per label, stitched together.
 **Reads:** `session04_fuzzy_labels.csv`.
-**Produces:** `src/data/session05_structured_explanations.csv`. Example (Naive): *"The model has high absolute error with a slight tendency to overpredict demand. Its percentage error is high, limiting usefulness for demand-sensitive decisions. It struggles to correctly identify whether demand will rise or fall."*
+**Produces:** `src/data/session05_structured_explanations.csv`. Example (Naive): *"The model has high absolute error with a slight tendency to underpredict demand. Its percentage error is high, limiting usefulness for demand-sensitive decisions. It struggles to correctly identify whether demand will rise or fall."*
 
 ### `06_narrative_layer.ipynb`
 **Goal:** wrap that sentence with an opening line (an overall verdict) and a closing line (what the directional accuracy means for someone scheduling operations).
 **Reads:** `session05_structured_explanations.csv`.
-**Produces:** `src/data/session06_narratives.csv`. Example (Prophet): *"Prophet is one of the stronger models in this comparison. The model achieves low absolute error with a slight tendency to overpredict demand. Its percentage error is low, making it reliable across different demand levels. It correctly identifies the direction of demand change roughly two-thirds of the time. This level of directional accuracy is generally useful for operational scheduling."*
+**Produces:** `src/data/session06_narratives.csv`. Example (Prophet): *"Prophet is one of the stronger models in this comparison. The model achieves low absolute error with a slight tendency to underpredict demand. Its percentage error is low, making it reliable across different demand levels. It correctly identifies the direction of demand change roughly two-thirds of the time. This level of directional accuracy is generally useful for operational scheduling."*
 **Fixed on 2026-06-22:** the closing sentence used to repeat the exact same directional-accuracy fact the previous sentence already stated, just reworded ("...two-thirds of the time" twice). It now adds the *operational implication* instead of repeating the fact. Notebooks 06 and 07 were re-run after the fix, so the CSVs on disk already reflect this.
 
 ### `07_full_pipeline.ipynb`
@@ -154,7 +154,7 @@ The main file is `src/components/ForecastDashboard.jsx`, with `src/components/Fo
 2. Notebook 06's narrative no longer repeats the same directional-accuracy fact twice in different words.
 3. `README.md` corrected — it used to claim notebook 08 produces no output file (it does: `session08_sensitivity.json`) and described the dashboard as having three tabs (it has four).
 4. `requirements.txt` was missing `scikit-fuzzy`, which notebooks 04 and 08 both require — a fresh `pip install -r requirements.txt` would have failed those two notebooks. Added.
-5. The "best" badge and the bar chart in `ForecastDashboard.jsx` both treated MPE like every other metric (assuming either "lowest is best" or "highest is best"). MPE is a *signed bias* metric — the best value is the one closest to zero, not the highest or lowest raw value. Sorting by MPE used to put the most over-forecasting model first and tag it "best." Fixed with a shared `rankScore()`/`BEST_DIRECTION` helper so the table sort, the "best" badge, and the bar chart all rank MPE by `|value|` instead of the raw signed value. Verified in browser: sorting by MPE now correctly puts Seasonal Naive (−0.57%, closest to zero) first.
+5. The "best" badge and the bar chart in `ForecastDashboard.jsx` both treated MPE like every other metric (assuming either "lowest is best" or "highest is best"). MPE is a *signed bias* metric — the best value is the one closest to zero, not the highest or lowest raw value. Sorting by MPE used to put the most under-forecasting model first and tag it "best." Fixed with a shared `rankScore()`/`BEST_DIRECTION` helper so the table sort, the "best" badge, and the bar chart all rank MPE by `|value|` instead of the raw signed value. Verified in browser: sorting by MPE now correctly puts Seasonal Naive (−0.57%, closest to zero) first.
 6. Did a clean re-run of all 9 notebooks end to end (2026-06-23). This also resolved the stale `FileNotFoundError` outputs notebooks 01/02 used to show as committed — they ran clean once executed with the correct working directory (see the working-directory note in §4's notebook 01 section). All regenerated metrics matched the previously-documented values exactly, confirming the pipeline is fully deterministic and reproducible.
 7. File-structure cleanup (2026-06-23): removed Jupyter checkpoint clutter (some of which had been accidentally committed), deleted a leftover `dist/` build directory, deleted the orphaned `session03_comparison.csv`/`session03_metrics.csv`, trimmed `src/data/archive/` from 47MB of unused other-utility CSVs down to just `AEP_hourly.csv` (the only file any notebook actually reads), and moved `steps.jsx` out of `src/data/` (which otherwise holds only generated pipeline output) into `src/content/steps.js`, updating the one import in `App.jsx` accordingly. Verified the build and the Notebooks tab both still work correctly after the move.
 
@@ -162,7 +162,7 @@ The main file is `src/components/ForecastDashboard.jsx`, with `src/components/Fo
 
 - **`src/data/session05_structured_explanations.csv` and `session07_full_pipeline_summary.csv` are written but never read** by the live dashboard (it gets the same text from `session06_narratives.csv` instead, which is a superset). Not broken, just dead weight — worth knowing so you don't assume editing them changes anything in the app.
 - **Notebook 08 has no entry in the "Notebooks" browsing view** (`src/content/steps.js` only lists 01–07) and no HTML export in `public/`, even though its data is fully wired into the dashboard's fourth tab. Inconsistent coverage between the two views.
-- **The MPE sign convention** described in §2 is consistent throughout the code but easy to misread; worth one explicit sentence about it in the thesis write-up so a reader doesn't mistake it for an error.
+- **The MPE sign convention** described in §2 is easy to misread, and was in fact applied backwards in several places until the fixes dated 2026-08-08 and 2026-10-11 below; worth one explicit sentence about it in the thesis write-up so a reader knows which direction a positive MPE means.
 
 ### Fixed 2026-07-21 (repo-structure audit)
 
@@ -191,6 +191,11 @@ None of the remaining items require a redesign — they're all small, contained 
 16. **Threshold Sensitivity comparability caption reworded** with a concrete example (0.85 vs. 0.85 not being the same thing across models) and a new legend note that colour indicates within-model stability, not cross-model rank.
 17. **Free-text preference classifier (Metrics tab):** `src/components/MetricsPreferenceControl.jsx` — a text box that classifies a plain-language description of what matters most ("I need to avoid big cost spikes") into one of four fixed preferences via a live call to the same local Ollama/`llama3` integration notebook 09 uses (no new provider, no API key, `temperature=0`, JSON-constrained output). The LLM's only output is one of five fixed labels (four preferences + "unclear"); everything downstream — which metric to sort by — is a plain, deterministic object lookup, not an LLM decision. Confirm-before-apply, plus an always-available manual dropdown. The first prompt version guessed a category on genuinely ambiguous input (e.g. "not sure, just pick something reasonable") rather than saying "unclear" — fixed by adding explicit negative examples for the fallback case to the system prompt, verified by re-testing.
 18. **SNaive tooltip rebuilt as a CSS-hover tooltip** (`.hint`/`.hint__bubble` in `app.css`) instead of the native `title` attribute, which wasn't reliably rendering its tooltip bubble across browsers.
+
+### Fixed 2026-10-11 (MPE sign convention, final pass)
+
+19. **Notebook 03's "Bias check" cell had the MPE sign convention backwards** — the last place it survived. The printed header said "+ = over-forecast, − = under-forecast" and `bias_label` mapped `MPE > 1` to "over-forecast", so all six positive-MPE models were labelled over-forecasting when they in fact under-forecast. Corrected to match `compute_metrics()` (`mean((actual − predicted) / actual) × 100`), with a comment pointing at that formula. The cell's saved output was regenerated from `src/data/metrics_all_models.json` rather than by re-running the notebook, so the metric values are byte-identical to before and only the header and seven labels changed. The same convention had already been fixed in notebooks 04 and 08 and in the dashboard's `biasLabel()` on 2026-08-08.
+20. **Prose descriptions of the convention corrected** in `README.md` (fuzzy-label universe list, which implied underprediction sat at the negative end of the MPE axis), `src/components/ForecastDashboard.jsx` (the MPE metric tooltip still said "Positive = model tends to predict too high"), and §2/§4/§6 of this report (the §2 note that described the backwards labelling as a deliberate naming choice rather than a bug; the notebook-04/05/06 example labels, which were stale pre-fix "overprediction" strings; and the notebook-04 threshold table's `low / under … high / over` column headers, which are `low / over … high / under` for MPE).
 
 ## 7. Suggested next steps
 
